@@ -80,6 +80,10 @@ def AddEmp():
     print("all modification done...")
     return render_template('AddEmpOutput.html', name=emp_name)
 
+@app.route("/leclogin")
+def LecLoginPage():
+    return render_template('LecturerLogin.html')
+
 @app.route("/loginlec", methods=['GET','POST'])
 def LoginLec():
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
