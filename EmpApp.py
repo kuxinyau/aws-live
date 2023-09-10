@@ -80,6 +80,29 @@ def AddEmp():
     print("all modification done...")
     return render_template('AddEmpOutput.html', name=emp_name)
 
+@app.route("/loginlec", methods=['GET','POST'])
+def LoginLec():
+    if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
+        email = request.form['email']
+        password = request.form['password']
+
+        select_sql = "SELECT * FROM lecturer WHERE email = %s AND password = %s"
+        cursor = db_conn.cursor()
+
+        try:
+            cursor.execute(select_sql, (email,password,))
+            lecturer = cursor.fetchone()
+
+            if not lecturer:
+                return render_template('LecturerLogin.html', msg="Access Denied : Invalid email or password")
+            
+        except Exception as e:
+            return str(e)
+
+        finally:   
+            cursor.close()
+        
+    return render_template('LecturerLogin.html', msg="success")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
