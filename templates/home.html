@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css')}}" />
+    
+    <nav>
+        <div class="homeNav">
+            <a href="#">Home</a>
+        </div>
+        <div class="otherNav">
+            <a href="#">Company</a>
+            <a href="#">Uni Supervisor</a>
+            <a href="#">Admin</a>
+            <a href="#">Student</a>
+        </div>
+    </nav>
+</head>
+
+<body>
+
+    <body>
+        <div class="container body-content">
+            <style>
+                img {
+                    display: block;
+                    margin: auto;
+                    width: 110%;
+                }
+
+                .col {
+                    flex: 1;
+                    padding: 1em;
+                }
+
+                .row {
+                    display: flex;
+                }
+            </style>
+
+            <br>
+
+            <div class="row">
+                <div class="jumbotron">
+                    <div style="text-align:center">
+                        <h2 style="color:dodgerblue">FOCS ITP <span
+                                style="font-family:'Comic Sans MS'">onMyFinger</span></h2>
+                    </div>
+                    <div class="content">
+                        <div class="logoCol">
+                            <div style="text-align:center">
+                                <img alt="TAR UMT logo" src="{{ url_for('static', filename='images/TARlogo.jpg')}}" style="width:180px;height:200px;">
+                            </div> 
+                        </div>
+
+                        <div class="col  col-md-9">
+                            <h3>BAIT305C/AMIT3205/BMMC3205 Industrial Training Programme</h3>
+                            <p>
+                                <b>Industrial Training</b> is a compulsory programme that open doors for internship
+                                essentials.
+                                The programme focuses on student internship attachment, as evidence of work capabilities
+                                such as expanding professional network,
+                                social values, work quality and ethics.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footerRow">
+                <p class="lead"><i>This website is mainly for students from Faculty of Computing and Information
+                        Technology (FOCS) to submit their ITP related documents. </i></p>
+            </div>
+
+            <hr>
+            <footer>
+                <p>© 2023 - TAR UMT FOCS ITP</p>
+            </footer>
+        </div>
+
+
+        <script src="/bundles/bootstrap?v=lescQEuG5u4jd-GcVDBcbpUOSyTDIg0Kk9zHDX55GCw1"></script>
+
+
+
+
+    </body>
+
+</body>
+
+</html>
