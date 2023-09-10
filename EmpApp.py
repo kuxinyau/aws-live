@@ -86,7 +86,7 @@ def LecLoginPage():
 
 @app.route("/loginlec", methods=['GET','POST'])
 def LoginLec():
-    if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
+    if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
