@@ -97,8 +97,9 @@ def LoginLec():
             cursor.execute(select_sql, (email,password,))
             lecturer = cursor.fetchone()
 
-            if not lecturer:
-                return render_template('LecturerLogin.html', msg="Access Denied : Invalid email or password")
+            if lecturer:
+                msg = lecturer[0] + lecturer[1] + lecturer[2]
+                return render_template('LecturerLogin.html', msg=msg)
             
         except Exception as e:
             return str(e)
@@ -106,7 +107,7 @@ def LoginLec():
         finally:   
             cursor.close()
         
-    return render_template('LecturerLogin.html', msg="success")
+    return render_template('LecturerLogin.html', msg="Access Denied : Invalid email or password")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
