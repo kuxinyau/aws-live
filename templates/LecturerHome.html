@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        body {
+            margin: 0px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        nav {
+            display: flex;
+            top: 0;
+            right: 0;
+            background-color: #1f1f1f;
+            padding: 15px;
+            justify-content: space-between;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #b9b9b9;
+            font-size: 16px;
+            margin-left: 20px;
+            /* Add margin to space out the links */
+            transition: color 0.3s;
+            /* Smooth color transition on hover */
+        }
+
+        .form {
+            width: 100%;
+            display: flex;
+            padding: 5px;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .form .form-label {
+            width: 20%;
+            font-weight: bold;
+            text-align: end;
+            padding-right: 20px;
+        }
+
+        .btn {
+            font-size: 14px;
+        }
+
+        .panel-main {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0px;
+        }
+
+        .panel-main .panel-header {
+            background-color: #f5f5f5;
+            color: #333;
+            border-color: #ddd;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        i {
+            font-family: "Font Awesome";
+        }
+
+        #students th {
+            padding: 5px 0px;
+            text-align: left;
+            background-color: #333;
+            color: white;
+        }
+
+        #students td, #students th {
+            padding: 5px;
+        }
+
+        #students tr:nth-child(even){background-color: #f2f2f2;}
+        #students tr:hover {background-color: #ddd;}
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="homeNav">
+            <a href="#">Home</a>
+        </div>
+        <div class="otherNav">
+            <a href="#">Log Out</a>
+        </div>
+    </nav>
+
+    <div style="margin: 20px 100px; padding: 10px;">
+
+        <h2 style="font-weight: 500;">Welcome : {{ name }}</h2>
+        <hr>
+
+        <!-- LECTURER INFORMATION -->
+        <div class="panel-main">
+            <div class="panel-header">
+                <div>Profile</div>
+                <div><a href="/lecEditProfile" class="btn btn-outline-secondary">Edit</a></div>
+            </div>
+            <div style="padding: 15px;">
+                <div>
+                    <div class="form">
+                        <div class="form-label">Name</div>
+                        <div class="form-data">{{ lecturer.name }}</div>
+                    </div>
+                    <div class="form">
+                        <div class="form-label">Gender</div>
+                        <div class="form-data">{{ lecturer.gender }}</div>
+                    </div>
+                    <div class="form">
+                        <div class="form-label">Email</div>
+                        <div class="form-data">{{ lecturer.email }}</div>
+                    </div>
+                    <div class="form">
+                        <div class="form-label">Expertise</div>
+                        <div class="form-data">{{ lecturer.expertise }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
+        <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
+
+        <!-- STUDENTS -->
+        <div class="panel-main">
+            <div class="panel-header">
+                <div>Students</div>
+            </div>
+            
+            <div style="padding: 15px;">
+                {% if count == 0 %}
+                <div><a href="/studentAssign">Pick Students</a></div>
+                {% else %}
+                <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
+                    <tr>
+                        <th width="1%"></th>
+                        <th width="2%">ID</th>
+                        <th width="8%">Name</th>
+                        <!--<th width="1%">Programme</th>-->
+                        <th width="10%">Email</th>
+                        <!--<th width="1%">HP</th>-->
+                        <th width="15%">Company</th>
+                        <th width="1%">Com. Accept.</th>
+                        <th width="1%">Parent Ack.</th>
+                        <th width="1%">Indemnity Letter</th>
+                        <th width="1%">Hired Evidence</th>
+                        <th width="1%">Progress Report</th>
+                        <th width="1%">Final Report</th>
+                    </tr>
+                    {% for student in students %}
+                    <tr>
+                        <td>
+                            {% if student.gender == 'M' %}
+                            <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
+                            {% elif student.gender == 'F' %}
+                            <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
+                            {% endif %}
+                        </td>
+                        <td>{{ student.studentId }}</td>
+                        <td>{{ student.studentName }}</td>
+                        <!--<td>RSW</td>-->
+                        <td>{{ student.email }}</td>
+                        <!--<td>013-7776277</td>-->
+                        <td>{{ student.company }}</td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                    </tr>
+                    <tr>
+                        <td><div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div></td>
+                        <td>22WMR05664</td>
+                        <td>Ku Xin Yau Ku Xin Yau</td>
+                        <!--<td>RSW</td>-->
+                        <td>kukukuxy-wm20@student.tarc.edu.my</td>
+                        <!--<td>013-7776277</td>-->
+                        <td>QWERTYUI WERTYUI WERTYUIO WERTY</td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td><i class="fa fa-file-pdf-o"></i></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+            </div>
+        </div>
+        
+        <hr>
+        <footer>
+            <p>© 2023 - TAR UMT FOCS ITP</p>
+        </footer>
+    </div>
+
+
+    <script src="/bundles/bootstrap?v=lescQEuG5u4jd-GcVDBcbpUOSyTDIg0Kk9zHDX55GCw1"></script>
+</body>
+
+</html>
