@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, session, request
 from pymysql import connections
 import os
 import boto3
 from config import *
 
 app = Flask(__name__)
+app.secret_key = "CC"
 
 bucket = custombucket
 region = customregion
@@ -98,10 +99,12 @@ def LoginLec():
             lecturer = cursor.fetchone()
 
             if lecturer:
+                session['loginLecturer'] = lecturer[0]
                 select_sql = "SELECT * FROM student WHERE supervisor = %s"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 students = cursor.fetchall()
+
                 return render_template('LecturerHome.html', lecturer=lecturer, name=lecturer[2], gender=lecturer[3], email=lecturer[4], expertise=lecturer[5], students=students)
             
         except Exception as e:
@@ -111,6 +114,59 @@ def LoginLec():
             cursor.close()
         
     return render_template('LecturerLogin.html', msg="Access Denied : Invalid email or password")
+
+@app.route("/logoutlec")
+def LogoutLec():
+    if 'loginLecturer' in session:
+        session.pop('loginLecturer', None)
+    return render_template('home.html')
+
+@app.route("/lecHome")
+def LecHome():
+    if 'loginLecturer' in session:
+        lectId = session['loginLecturer']
+        return render_template('LecturerHome.html', lectId = lectId)
+    else:
+        return render_template('LecturerLogin.html')
+
+@app.route("/lecStudentDetails", methods=['GET'])
+def LecStudentDetails():
+    if 'loginLecturer' in session & request.args.get('studentId') is not None & request.args.get('studentId') != '':
+        lectId = session['loginLecturer']
+        studId = request.args.get('studentId')
+
+        select_sql = "SELECT * FROM students WHERE lecturer = %s AND studentID = %s"
+        cursor = db_conn.cursor()
+
+        try:
+            cursor.execute(select_sql, (lectId,studId,))
+            student = cursor.fetchone()
+
+            if student:
+                select_sql = "SELECT * FROM report WHERE supervisor = %s AND student = %s"
+
+                cursor.execute(select_sql, (lectId, studId,))
+                reports = cursor.fetchall()
+
+                return render_template('LecStudDetails.html', student=student, count=reports.count, reports=reports)
+            
+        except Exception as e:
+            return str(e)
+
+        finally:   
+            cursor.close()
+
+    return render_template('/lecHome')
+
+@app.route("/updateReportStatus", methods=['POST'])
+def LecUpdateReportStatus():
+    if request.method == 'POST':
+        if request.form['submit'] == 'approve':
+            status = 'Approved'
+        elif request.form['submit'] == 'reject':
+            status = 'Rejected'
+    
+    return render_template('LecStudDetails.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)

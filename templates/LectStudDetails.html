@@ -35,25 +35,6 @@
             /* Smooth color transition on hover */
         }
 
-        .form {
-            width: 100%;
-            display: flex;
-            padding: 5px;
-            align-items: center;
-            font-size: 14px;
-        }
-
-        .form .form-label {
-            width: 20%;
-            font-weight: bold;
-            text-align: end;
-            padding-right: 20px;
-        }
-
-        .btn {
-            font-size: 14px;
-        }
-
         .panel-main {
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -68,10 +49,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        i {
-            font-family: "Font Awesome";
         }
 
         #students th {
@@ -104,45 +81,74 @@
 <body>
     <nav>
         <div class="homeNav">
-            <a href="/lecHome">Home</a>
+            <a href="#">Home</a>
         </div>
         <div class="otherNav">
-            <a href="/logoutlec">Log Out</a>
+            <a href="#">Log Out</a>
         </div>
     </nav>
 
     <div style="margin: 20px 100px; padding: 10px;">
 
-        <h2 style="font-weight: 500;">Welcome : {{ lecturer[2] }}</h2>
-        <hr>
+        <div style="display: flex;">
+            <div><h2 style="font-weight: 500;">Report</h2></div>
+            <div><a href="/lecHome"></a></div>
+        </div>
+        <div style="color: #187bcd;">{{ studentName }} [{{ studentId }}]</div>
 
-        <!-- LECTURER INFORMATION -->
+        <!-- Student -->
+        <div>
+            <div>
+                <div>Student Email</div>
+                <div>{{ student.email }}</div>
+            </div>
+            <div>
+                <div>Student Email</div>
+                <div>{{ student.email }}</div>
+            </div>
+            <div>
+                <div>Student Email</div>
+                <div>{{ student.email }}</div>
+            </div>
+            <div>
+                <div>Student Email</div>
+                <div>{{ student.email }}</div>
+            </div>
+        </div>
+
+        <!-- Report -->
+        {% if count > 0 %}
+        <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+        {% for report in reports %}
         <div class="panel-main">
             <div class="panel-header">
-                <div>Profile</div>
+                <div>{{ report.reportType }} [Due: ]</div>
                 <div><a href="/lecEditProfile" class="btn btn-outline-secondary">Edit</a></div>
             </div>
             <div style="padding: 15px;">
                 <div>
-                    <div class="form">
-                        <div class="form-label">Name</div>
-                        <div class="form-data">{{ lecturer.name }}</div>
+                    <form action="/updateReportStatus" method="POST">
+                        <div>Status 
+                            <input type="submit" value="Approve" class="btn btn-success">
+                            <input type="submit" value="Reject" class="btn btn-danger">
+                        </div>
+                    </form>
+                    <div>
+                        Report (report link)
                     </div>
-                    <div class="form">
-                        <div class="form-label">Gender</div>
-                        <div class="form-data">{{ lecturer.gender }}</div>
+                    <div>
+                        Submitted Date : {{ report.submissionDate }}
                     </div>
-                    <div class="form">
-                        <div class="form-label">Email</div>
-                        <div class="form-data">{{ lecturer.email }}</div>
-                    </div>
-                    <div class="form">
-                        <div class="form-label">Expertise</div>
-                        <div class="form-data">{{ lecturer.expertise }}</div>
+                    <div>
+                        Remark
+                        <form action="/updateReportRemark" method="POST">
+                            <textarea name="remark" rows="5" cols="50"></textarea>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
         <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
         <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
@@ -154,7 +160,7 @@
             </div>
             
             <div style="padding: 15px;">
-                {% if not students %}
+                {% if count == 0 %}
                 <div><a href="/studentAssign">Pick Students</a></div>
                 {% else %}
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
