@@ -117,13 +117,13 @@
         </div>
 
         <!-- Report -->
-        {% if count > 0 %}
+        {% if reports %}
         <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
         {% for report in reports %}
         <div class="panel-main">
             <div class="panel-header">
                 <div>{{ report.reportType }} [Due: ]</div>
-                <div><a href="/lecEditProfile" class="btn btn-outline-secondary">Edit</a></div>
+                <div>></div>
             </div>
             <div style="padding: 15px;">
                 <div>
@@ -137,7 +137,7 @@
                         Report (report link)
                     </div>
                     <div>
-                        Submitted Date : {{ report.submissionDate }}
+                        Submitted Date : {{ report }}
                     </div>
                     <div>
                         Remark

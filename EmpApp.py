@@ -125,13 +125,34 @@ def LogoutLec():
 def LecHome():
     if 'loginLecturer' in session:
         lectId = session['loginLecturer']
-        return render_template('LecturerHome.html', lectId = lectId)
+
+        select_sql = "SELECT * FROM lecturer WHERE lectId = %s"
+        cursor = db_conn.cursor()
+
+        try:
+            cursor.execute(select_sql, (lectId,))
+            lecturer = cursor.fetchone()
+
+            if lecturer:
+                select_sql = "SELECT * FROM student WHERE supervisor = %s"
+
+                cursor.execute(select_sql, (lecturer[0],))
+                students = cursor.fetchall()
+            
+        except Exception as e:
+            return str(e)
+
+        finally:   
+            cursor.close()
+
+        return render_template('LecturerHome.html', lecturer=lecturer, students=students)
+    
     else:
         return render_template('LecturerLogin.html')
 
 @app.route("/lecStudentDetails", methods=['GET'])
 def LecStudentDetails():
-    if 'loginLecturer' in session & request.args.get('studentId') is not None & request.args.get('studentId') != '':
+    if 'loginLecturer' in session and request.args.get('studentId') is not None and request.args.get('studentId') != '':
         lectId = session['loginLecturer']
         studId = request.args.get('studentId')
 
@@ -143,12 +164,12 @@ def LecStudentDetails():
             student = cursor.fetchone()
 
             if student:
-                select_sql = "SELECT * FROM report WHERE supervisor = %s AND student = %s"
+                select_sql = "SELECT * FROM report WHERE student = %s"
 
-                cursor.execute(select_sql, (lectId, studId,))
+                cursor.execute(select_sql, (studId,))
                 reports = cursor.fetchall()
 
-                return render_template('LecStudDetails.html', student=student, count=reports.count, reports=reports)
+                return render_template('LecStudDetails.html', student=student, reports=reports)
             
         except Exception as e:
             return str(e)
