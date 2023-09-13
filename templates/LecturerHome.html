@@ -154,9 +154,9 @@
             </div>
             
             <div style="padding: 15px;">
-                {% if not students %}
+                {% if not students: %}
                 <div><a href="/studentAssign">Pick Students</a></div>
-                {% else %}
+                {% else: %}
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
                     <tr><th colspan="14" style="background-color: #187bcd;">{{ level }}</th></tr>
                     <tr><td colspan="14" style="background-color: white;"></td></tr>
@@ -172,12 +172,12 @@
                         <th width="15%">Company</th>
                         <th colspan="7" width="10%">Report</th>
                     </tr>
-                    {% for student in students %}
+                    {% for student in students: %}
                     <tr>
                         <td>
-                            {% if student.gender == 'M' %}
+                            {% if student.gender == 'M': %}
                             <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
-                            {% elif student.gender == 'F' %}
+                            {% elif student.gender == 'F': %}
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
