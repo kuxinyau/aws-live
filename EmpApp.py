@@ -1,4 +1,5 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect, send_file
+from botocore.exceptions import ClientError
 from pymysql import connections
 import os
 import boto3
@@ -188,6 +189,40 @@ def LecUpdateReportStatus():
             status = 'Rejected'
     
     return render_template('LecStudDetails.html')
+
+# Download resume from S3 (based on Student Id)
+@app.route('/lecViewResume', methods=['GET', 'POST'])
+def LecViewResume():
+    # Retrieve student's ID
+    studId = request.args.get('studentId')
+    if not studId:
+        return "Student undefined"
+
+    # Construct the S3 object key
+    object_key = f"{studId}_resume"
+
+    # Generate a presigned URL for the S3 object
+    s3_client = boto3.client('s3')
+
+    try:
+        response = s3_client.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': custombucket,
+                'Key': object_key,
+                'ResponseContentDisposition': 'inline',
+            },
+            ExpiresIn=3600  # Set the expiration time (in seconds) as needed
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            # If the resume does not exist, return a page with a message
+            return render_template('LecStudDetails.html', msg='no resume found')
+        else:
+            return str(e)
+
+    # Redirect the user to the URL of the PDF file
+    return redirect(response)
 
 @app.route("/fetchdata", methods=['POST'])
 def GetEmp():
