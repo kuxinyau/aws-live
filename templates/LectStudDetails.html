@@ -122,7 +122,7 @@
         {% for report in reports %}
         <div class="panel-main">
             <div class="panel-header">
-                <div>{{ report.reportType }} [Due: ]</div>
+                <div>{{ report[2] }} [Due: ]</div>
                 <div>></div>
             </div>
             <div style="padding: 15px;">
@@ -137,7 +137,7 @@
                         Report (report link)
                     </div>
                     <div>
-                        Submitted Date : {{ report }}
+                        Submitted Date : {{ report[1] }}
                     </div>
                     <div>
                         Remark
@@ -152,76 +152,6 @@
 
         <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
         <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
-
-        <!-- STUDENTS -->
-        <div class="panel-main">
-            <div class="panel-header">
-                <div>Students</div>
-            </div>
-            
-            <div style="padding: 15px;">
-                {% if count == 0 %}
-                <div><a href="/studentAssign">Pick Students</a></div>
-                {% else %}
-                <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
-                    <tr><th colspan="14" style="background-color: #187bcd;">{{ level }}</th></tr>
-                    <tr><td colspan="14" style="background-color: white;"></td></tr>
-                    <tr><td colspan="14" style="background-color: white;"></td></tr>
-                    <tr><td colspan="14" style="background-color: #003057; color: whitesmoke;">Internship Period : {{ startDate }} - {{ endDate }}</td></tr>
-                    <tr>
-                        <th width="1%"></th>
-                        <th width="2%">ID</th>
-                        <th width="8%">Name</th>
-                        <th width="1%">Programme</th>
-                        <th width="10%">Email</th>
-                        <th width="5%">HP</th>
-                        <th width="15%">Company</th>
-                        <th colspan="7" width="10%">Report</th>
-                    </tr>
-                    {% for student in students %}
-                    <tr>
-                        <td>
-                            {% if student.gender == 'M' %}
-                            <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
-                            {% elif student.gender == 'F' %}
-                            <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
-                            {% endif %}
-                        </td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId={{ student.studentId }}) }}" class="idUrl">{{ student.studentId }}</a></td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId={{ student.studentId }}) }}" class="idUrl">{{ student.studentId }}</a></td>
-                        <td>RSW</td>
-                        <td>{{ student.email }}</td>
-                        <td>013-7776277</td>
-                        <td>{{ student.company }}</td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                    </tr>
-                    <tr>
-                        <td><div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div></td>
-                        <td>22WMR05664</td>
-                        <td>Ku Xin Yau Ku Xin Yau</td>
-                        <td>RSW</td>
-                        <td>kukukuxy-wm20@student.tarc.edu.my</td>
-                        <td>013-7776277</td>
-                        <td>QWERTYUI WERTYUI WERTYUIO WERTY</td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
-            </div>
-        </div>
         
         <hr>
         <footer>
