@@ -71,10 +71,6 @@
             align-items: center;
         }
 
-        i {
-            font-family: "Font Awesome";
-        }
-
         #students th {
             padding: 5px 0px;
             text-align: left;
@@ -114,7 +110,7 @@
 
     <div style="margin: 20px 100px; padding: 10px;">
 
-        <h2 style="font-weight: 500;">Welcome : {{ lecturer }}</h2>
+        <h2 style="font-weight: 500;">Welcome : {{ lecturer[2] }}</h2>
         <hr>
 
         <!-- LECTURER INFORMATION -->
@@ -134,9 +130,9 @@
                         <div class="form-label">Name</div>
                         <div class="form-data">
                             {% if lecturer[3] == 'M' %}
-                            <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
+                            <span style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></span>
                             {% elif lecturer[3] == 'F' %}
-                            <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
+                            <span style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></span>
                             {% endif %} {{ lecturer[2] }}
                         </div>
                     </div>
@@ -160,8 +156,8 @@
             <div class="panel-header">
                 <div>Students</div>
                 <form action="/displayStudent" autocomplete="on" method="POST">                                                        
-                    <button type="submit" name="action" value="pickUp" >Pick Up</button> 
-                    <button type="submit" name="action" value="drop" >Drop</button>     
+                    <button type="submit" name="action" value="pickUp" class="btn btn-outline-secondary">Pick Up</button> 
+                    <button type="submit" name="action" value="drop" class="btn btn-outline-secondary">Drop</button>
                     <input type="hidden" name="lec_id" value="{{ lecturer[0] }}">
               </form>
             </div>
@@ -171,7 +167,7 @@
                 <div>Not found any supervised student</div>
                 {% else %}
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
-                    <tr><th colspan="14" style="background-color: #187bcd;">{{ student[7] }}</th></tr>
+                    <tr><th colspan="14" style="background-color: #187bcd;">{{ level }}</th></tr>
                     <tr><td colspan="14" style="background-color: white;"></td></tr>
                     <tr><td colspan="14" style="background-color: white;"></td></tr>
                     <tr><td colspan="14" style="background-color: #003057; color: whitesmoke;">Internship Period : {{ startDate }} - {{ endDate }}</td></tr>

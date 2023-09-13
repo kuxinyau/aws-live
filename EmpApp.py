@@ -105,7 +105,7 @@ def LoginLec():
                 cursor.execute(select_sql, (lecturer[0],))
                 students = cursor.fetchall()
 
-                return render_template('LecturerHome.html', lecturer=lecturer, name=lecturer[2], gender=lecturer[3], email=lecturer[4], expertise=lecturer[5], students=students)
+                return render_template('LecturerHome.html', students=students)
             
         except Exception as e:
             return str(e)
