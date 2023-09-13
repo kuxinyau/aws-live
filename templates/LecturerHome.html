@@ -48,6 +48,7 @@
             font-weight: bold;
             text-align: end;
             padding-right: 20px;
+            margin-bottom: 0px;
         }
 
         .btn {
@@ -124,6 +125,7 @@
                     <form action="/fetchdata" autocomplete="on" method="POST">
                         <input  type="hidden" name="lec_id" value="{{ lecturer[0] }}" autofocus size="40">
                         <button type="submit" class="btn btn-outline-secondary">Edit</button>
+                    </form>
                 </div>
             </div>
             <div style="padding: 15px;">
@@ -135,12 +137,8 @@
                             <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
                             {% elif lecturer[3] == 'F' %}
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
-                            {% endif %} {{ lecturer['name'] }}
+                            {% endif %} {{ lecturer[2] }}
                         </div>
-                    </div>
-                    <div class="form">
-                        <div class="form-label">Gender</div>
-                        <div class="form-data">{{ lecturer.gender }}</div>
                     </div>
                     <div class="form">
                         <div class="form-label">Email</div>
@@ -148,7 +146,7 @@
                     </div>
                     <div class="form">
                         <div class="form-label">Expertise</div>
-                        <div class="form-data">{{ lecturer.expertise }}</div>
+                        <div class="form-data">{{ lecturer[5] }}</div>
                     </div>
                 </div>
             </div>
@@ -173,7 +171,7 @@
                 <div>Not found any supervised student</div>
                 {% else %}
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
-                    <tr><th colspan="14" style="background-color: #187bcd;">{{ level }}</th></tr>
+                    <tr><th colspan="14" style="background-color: #187bcd;">{{ student[7] }}</th></tr>
                     <tr><td colspan="14" style="background-color: white;"></td></tr>
                     <tr><td colspan="14" style="background-color: white;"></td></tr>
                     <tr><td colspan="14" style="background-color: #003057; color: whitesmoke;">Internship Period : {{ startDate }} - {{ endDate }}</td></tr>
@@ -190,34 +188,18 @@
                     {% for student in students %}
                     <tr>
                         <td>
-                            {% if student.gender == 'M' %}
+                            {% if student[4] == 'M' %}
                             <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
-                            {% elif student.gender == 'F' %}
+                            {% elif student[4] == 'F' %}
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student.studentId) }}" class="idUrl">{{ student.studentId }}</a></td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student.studentId) }}" class="idUrl">{{ student.studentId }}</a></td>
-                        <td>RSW</td>
-                        <td>{{ student.email }}</td>
-                        <td>013-7776277</td>
-                        <td>{{ student.company }}</td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                    </tr>
-                    <tr>
-                        <td><div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div></td>
-                        <td>22WMR05664</td>
-                        <td>Ku Xin Yau Ku Xin Yau</td>
-                        <td>RSW</td>
-                        <td>kukukuxy-wm20@student.tarc.edu.my</td>
-                        <td>013-7776277</td>
-                        <td>QWERTYUI WERTYUI WERTYUIO WERTY</td>
+                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ student[0] }}</a></td>
+                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ studen[0] }}</a></td>
+                        <td>{{ student[7] }}</td>
+                        <td>{{ student[6] }}</td>
+                        <td>{{ stduent[3] }}</td>
+                        <td>{{ student }}</td>
                         <td><i class="fa fa-file-pdf-o"></i></td>
                         <td><i class="fa fa-file-pdf-o"></i></td>
                         <td><i class="fa fa-file-pdf-o"></i></td>
