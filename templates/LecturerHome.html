@@ -181,8 +181,8 @@
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId={{ student.studentId }}) }}" class="idUrl">{{ student.studentId }}</a></td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId={{ student.studentId }}) }}" class="idUrl">{{ student.studentId }}</a></td>
+                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student.studentId) }}" class="idUrl">{{ student.studentId }}</a></td>
+                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student.studentId) }}" class="idUrl">{{ student.studentId }}</a></td>
                         <td>RSW</td>
                         <td>{{ student.email }}</td>
                         <td>013-7776277</td>
