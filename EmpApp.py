@@ -156,7 +156,7 @@ def LecStudentDetails():
         lectId = session['loginLecturer']
         studId = request.args.get('studentId')
 
-        select_sql = "SELECT * FROM student WHERE lecturer = %s AND studentID = %s"
+        select_sql = "SELECT * FROM student WHERE supervisor = %s AND studentID = %s"
         cursor = db_conn.cursor()
 
         try:
