@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<center>
+	<font color="grey" size="5" style="font-family: avenir">
+		<body bgcolor="lightgrey">
+			<h1>PICK UP SUCCESSFUL</h1><br>
+			<h2>Following Student has been picked up</h2><br>
+            {% for student in student_list %}
+
+			<h5>{{ student }}</h5><br>
+
+            {% endfor %}
+			<title>Student Pick Up Output</title>
+				<form action="/leclogin" autocomplete="on" method = "GET">
+
+					<button type="submit" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;" 
+					>GO BACK</button><br><br>
+
+				</form>
+		</body>
+	</font>
+</center>
+</head>
+<body>
+
+</body>
+</html>

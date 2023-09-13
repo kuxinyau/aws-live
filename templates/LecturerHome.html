@@ -120,13 +120,23 @@
         <div class="panel-main">
             <div class="panel-header">
                 <div>Profile</div>
-                <div><a href="/lecEditProfile" class="btn btn-outline-secondary">Edit</a></div>
+                <div>
+                    <form action="/fetchdata" autocomplete="on" method="POST">
+                        <input  type="hidden" name="lec_id" value="{{ lecturer[0] }}" autofocus size="40">
+                        <button type="submit" class="btn btn-outline-secondary">Edit</button>
+                </div>
             </div>
             <div style="padding: 15px;">
                 <div>
                     <div class="form">
                         <div class="form-label">Name</div>
-                        <div class="form-data">{{ lecturer.name }}</div>
+                        <div class="form-data">
+                            {% if lecturer[3] == 'M' %}
+                            <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
+                            {% elif lecturer[3] == 'F' %}
+                            <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
+                            {% endif %} {{ lecturer['name'] }}
+                        </div>
                     </div>
                     <div class="form">
                         <div class="form-label">Gender</div>
@@ -134,7 +144,7 @@
                     </div>
                     <div class="form">
                         <div class="form-label">Email</div>
-                        <div class="form-data">{{ lecturer.email }}</div>
+                        <div class="form-data">{{ lecturer[4] }}</div>
                     </div>
                     <div class="form">
                         <div class="form-label">Expertise</div>
@@ -151,12 +161,17 @@
         <div class="panel-main">
             <div class="panel-header">
                 <div>Students</div>
+                <form action="/displayStudent" autocomplete="on" method="POST">                                                        
+                    <button type="submit" name="action" value="pickUp" >Pick Up</button> 
+                    <button type="submit" name="action" value="drop" >Drop</button>     
+                    <input type="hidden" name="lec_id" value="{{ lecturer[0] }}">
+              </form>
             </div>
             
             <div style="padding: 15px;">
-                {% if not students: %}
-                <div><a href="/studentAssign">Pick Students</a></div>
-                {% else: %}
+                {% if not students %}
+                <div>Not found any supervised student</div>
+                {% else %}
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
                     <tr><th colspan="14" style="background-color: #187bcd;">{{ level }}</th></tr>
                     <tr><td colspan="14" style="background-color: white;"></td></tr>
@@ -172,12 +187,12 @@
                         <th width="15%">Company</th>
                         <th colspan="7" width="10%">Report</th>
                     </tr>
-                    {% for student in students: %}
+                    {% for student in students %}
                     <tr>
                         <td>
-                            {% if student.gender == 'M': %}
+                            {% if student.gender == 'M' %}
                             <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
-                            {% elif student.gender == 'F': %}
+                            {% elif student.gender == 'F' %}
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
