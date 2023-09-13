@@ -190,8 +190,8 @@
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ student[0] }}</a></td>
-                        <td><a href="{{ url_for('/lecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ studen[0] }}</a></td>
+                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ student[0] }}</a></td>
+                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ studen[0] }}</a></td>
                         <td>{{ student[7] }}</td>
                         <td>{{ student[6] }}</td>
                         <td>{{ stduent[3] }}</td>
