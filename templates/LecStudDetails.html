@@ -253,6 +253,7 @@
                                 <span style="color: #FFA500;">(late)</span>
                                 {% endif %}
                             </div>
+                            {% if report[3] == 'submitted' %}
                             <form action="/updateReportStatus" method="POST" enctype="multipart/form-data">
                                 <div style="padding-bottom: 10px;">
                                     Remark
