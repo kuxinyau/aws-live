@@ -143,8 +143,8 @@ def LoginLec():
                         }
                     students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
                 print(students)
-                print(students.reports.count)
-                return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=students.reports.count, image_url=response)
+                print(len(students[studId]['reports']))
+                return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[studId]['reports']), image_url=response)
             
         except Exception as e:
             return str(e)
@@ -220,7 +220,7 @@ def LecHome():
         finally:   
             cursor.close()
         
-        return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=students.reports.count, image_url=response)
+        return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[studId]['reports']), image_url=response)
     
     else:
         return render_template('LecturerLogin.html')
