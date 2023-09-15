@@ -375,7 +375,7 @@ def LecViewReport():
             'get_object',
             Params={
                 'Bucket': custombucket,
-                'Key': f"progressReport/{studId}/{studId}_{type}",
+                'Key': object_key,
                 'ResponseContentDisposition': 'inline',
             },
             ExpiresIn=3600  # Set the expiration time (in seconds) as needed
