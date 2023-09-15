@@ -259,11 +259,11 @@
                         {% for report in student['reports'] %}
                         <td>
                             {% if report['reportLate'] == 1 %}
-                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #FFA500;">
+                            <a href="{{ url_for('LecViewReport', studentId=student['studentId'], reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #FFA500;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
                             {% elif report['reportStatus'] == 'submitted' %}
-                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: blue;">
+                            <a href="{{ url_for('LecViewReport', studentId=student['studentId'], reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: blue;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
                             {% elif report['reportStatus'] == 'approved' %}

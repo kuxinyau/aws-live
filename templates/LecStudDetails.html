@@ -236,7 +236,6 @@
             {% for report in reports %}
             <div class="panel-main">
                 <div class="panel-header">
-                    {% if report[2]|replace(" ", "")|lower == report_name|replace(" ", "")|lower %}
                     <div>{{ report[2]|regex_replace(r'(\B[A-Z0-9])', r' \1') }} {{ report[2]|regex_replace("\D", "") }}</div>
                     <div></div>
                 </div>

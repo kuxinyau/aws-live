@@ -116,7 +116,7 @@ def LoginLec():
                 except Exception as e:
                     return str(e)
 
-                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
+                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 raw_students = cursor.fetchall()
@@ -142,8 +142,7 @@ def LoginLec():
                             'reports': []
                         }
                     students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
-                print(students)
-                print(len(students[raw_students[0][0]]['reports']))
+                
                 return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[raw_students[0][0]]['reports']), image_url=response)
             
         except Exception as e:
@@ -360,7 +359,7 @@ def LecViewDoc():
 def LecViewReport():
     # Retrieve student's ID
     studId = request.args.get('studentId')
-    type = request.args.get('type')
+    type = request.args.get('reportType')
 
     if not studId and not type:
         return "Student undefined or Document error"
