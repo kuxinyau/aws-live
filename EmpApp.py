@@ -259,9 +259,9 @@ def LecUpdateReportStatus():
         studId = request.form['studentId']
         reportType = request.form['reportType']
         remark = request.form['remark']
-        if request.form['submit'] == 'approve':
+        if request.form['status'] == 'approve':
             status = 'Approved'
-        elif request.form['submit'] == 'reject':
+        elif request.form['status'] == 'reject':
             status = 'Rejected'
 
         if remark.strip():

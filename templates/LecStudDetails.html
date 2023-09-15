@@ -259,8 +259,8 @@
                                     <div class="remarkForm"><textarea name="remark" rows="4" cols="45"
                                             class="remark"></textarea></div>
                                 </div>
-                                <input type="submit" value="Approve" class="btn btn-success" style="font-size: 14px;" />
-                                <input type="submit" value="Reject" class="btn btn-danger" style="font-size: 14px;" />
+                                <input type="submit" name="status" value="approve" class="btn btn-success" style="font-size: 14px;" />
+                                <input type="submit" name="status" value="reject" class="btn btn-danger" style="font-size: 14px;" />
                                 <input type="hidden" value="{{ report[2] }}" name="reportType" />
                                 <input type="hidden" value="{{ student[0] }}" name="studentId" />
                             </form>
