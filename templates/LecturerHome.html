@@ -65,7 +65,7 @@
             width: 20%;
             font-weight: bold;
             text-align: end;
-            padding-right: 20px;
+            padding-right: 30px;
             margin-bottom: 0px;
         }
 
@@ -120,6 +120,15 @@
             color: #187bcd;
             text-decoration: none;
         }
+
+        .pdfReport {
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .pdfReport:hover, .pdfReport:active {
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -149,11 +158,11 @@
                     </form>
                 </div>
             </div>
-            <div style="padding: 15px;">
+            <div style="padding: 15px 30px; display: flex; align-items: center;">
                 <div>
-                    <img src="{{ image_url }}" alt="No Profile Picture" />
+                    <img src="{{ image_url }}" alt="No Profile Picture" style="width: 100px;" />
                 </div>
-                <div>
+                <div style="width: 70%;">
                     <div class="form">
                         <div class="form-label">Name</div>
                         <div class="form-data">
@@ -198,23 +207,23 @@
                     {% set ns = namespace(current_level=None, current_cohort=None) %}
 
                     {% for student in students %}
-                    {% if student[7] != ns.current_level %}
+                    {% if student.level != ns.current_level %}
                     <tr>
-                        <th colspan="14" style="background-color: #187bcd;">{{ student[7] }}</th>
+                        <th colspan="14" style="background-color: #187bcd;">{{ student.level }}</th>
                     </tr>
                     <tr>
                         <td colspan="14" style="background-color: white;"></td>
                     </tr>
                     {% endif %}
 
-                    {% set ns.current_level = student[7] %}
-                    {% if student[10] != ns.current_cohort %}
+                    {% set ns.current_level = student.level %}
+                    {% if student.cohortId != ns.current_cohort %}
                     <tr>
                         <td colspan="14" style="background-color: white;"></td>
                     </tr>
                     <tr>
                         <td colspan="14" style="background-color: #003057; color: whitesmoke;">Internship Period : {{
-                            student[13] }} until {{ student[14] }}</td>
+                            student.startDate }} to {{ student.endDate }}</td>
                     </tr>
                     <tr>
                         <th width="1%"></th>
@@ -226,40 +235,50 @@
                         <th width="15%">Company</th>
                         <th colspan="7" width="10%">Report</th>
                     </tr>
-                    {% set ns.current_cohort = student[10] %}
+                    {% set ns.current_cohort = student.cohortId %}
                     {% endif %}
                     <tr>
                         <td>
-                            {% if student[4] == 'M' %}
+                            {% if student.gender == 'M' %}
                             <div style="color: #187bcd; font-size: 24px;"><iconify-icon
                                     icon="fa-solid:male"></iconify-icon></div>
-                            {% elif student[4] == 'F' %}
+                            {% elif student.gender == 'F' %}
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon
                                     icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
                         <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{
-                                student[0] }}</a></td>
+                                student.studentId }}</a></td>
                         <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{
-                                student[1] }}</a></td>
-                        <td>{{ student[8] }}</td>
-                        <td>{{ student[6] }}</td>
-                        <td>{{ student[3] }}</td>
-                        <td>{{ student[11] }}</td>
-                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
-                                    class="fa fa-file-pdf-o"></i></a></td>
-                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
-                                    class="fa fa-file-pdf-o"></i></a></td>
-                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
-                                    class="fa fa-file-pdf-o"></i></a></td>
-                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
-                                    class="fa fa-file-pdf-o"></i></a></td>
-                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
-                                    class="fa fa-file-pdf-o"></i></a></td>
-                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
-                                    class="fa fa-file-pdf-o"></i></a></td>
-                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
-                                    class="fa fa-file-pdf-o"></i></a></td>
+                                student.name }}</a></td>
+                        <td>{{ student.programme }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.hp }}</td>
+                        <td>{{ student.company }}</td>
+                        
+                        {% for report in student.reports %}
+                        <td>
+                            {% if report.reportLate == 1 %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #FFA500;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report.reportStatus == 'submitted' %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: blue;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report.reportStatus == 'approved' %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: green;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report.reportStatus == 'rejected' %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: red;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report.reportStatus == 'pending' %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #808080;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>

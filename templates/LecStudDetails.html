@@ -215,15 +215,15 @@
             <!-- show supporting document -->
             <div style="margin-right: 150px; border: 2px solid #005295; border-radius: 5px;">
                 <div style="padding: 10px;">
-                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                    <div><a href="{{ url_for('LecViewDoc', studentId=student[0], type='resume') }}" target="_blank"
                             class="idUrl">Resume</a></div>
-                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                    <div><a href="{{ url_for('LecViewDoc', studentId=student[0], type='comAcc') }}" target="_blank"
                             class="idUrl">Company Acceptance Form id_StudF05</a></div>
-                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                    <div><a href="{{ url_for('LecViewDoc', studentId=student[0], type='parentAck') }}" target="_blank"
                             class="idUrl">Parent Acknowledgement Form</a></div>
-                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                    <div><a href="{{ url_for('LecViewDoc', studentId=student[0], type='indemnity') }}" target="_blank"
                             class="idUrl">Letter of Indemnity</a></div>
-                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                    <div><a href="{{ url_for('LecViewDoc', studentId=student[0], type='hiredEvi') }}" target="_blank"
                             class="idUrl">Hired Evidence</a></div>
                 </div>
             </div>
@@ -236,31 +236,34 @@
             {% for report in reports %}
             <div class="panel-main">
                 <div class="panel-header">
-                    <div>{{ report[2] }} [Due: ]</div>
+                    {% if report[2]|replace(" ", "")|lower == report_name|replace(" ", "")|lower %}
+                    <div>{{ report[2]|regex_replace(r'(\B[A-Z0-9])', r' \1') }} {{ report[2]|regex_replace("\D", "") }}</div>
                     <div></div>
                 </div>
                 <div style="padding: 15px;">
                     <div style="display: flex;">
                         <div style="padding: 0px 20px 0px 10px;"><a
-                                href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                                href="{{ url_for('LecViewDoc', studentId=student[0], type=report[2]) }}" target="_blank"
                                 class="idUrl"><iconify-icon icon="iwwa:file-pdf"
                                     style="font-size: 150px;"></iconify-icon></a></div>
                         <div>
                             <div style="padding-bottom: 10px;">
                                 Submitted Date : {{ report[1] }}
                                 {% if report[4] == 1 %}
-                                <span style="color: yellow;">(late)</span>
+                                <span style="color: #FFA500;">(late)</span>
                                 {% endif %}
                             </div>
                             {% if report[3] == 'submitted' %}
-                            <form action="/updateReportStatus" method="POST">
+                            <form action="/updateReportStatus" method="POST" enctype="multipart/form-data">
                                 <div style="padding-bottom: 10px;">
                                     Remark
                                     <div class="remarkForm"><textarea name="remark" rows="4" cols="45"
                                             class="remark"></textarea></div>
                                 </div>
-                                <input type="submit" value="Approve" class="btn btn-success" style="font-size: 14px;">
-                                <input type="submit" value="Reject" class="btn btn-danger" style="font-size: 14px;">
+                                <input type="submit" value="Approve" class="btn btn-success" style="font-size: 14px;" />
+                                <input type="submit" value="Reject" class="btn btn-danger" style="font-size: 14px;" />
+                                <input type="hidden" value="{{ report[2] }}" name="reportType" />
+                                <input type="hidden" value="{{ student[0] }}" name="studentId" />
                             </form>
                             {% else %}
                             {% if report[5] %}

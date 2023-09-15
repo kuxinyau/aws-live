@@ -150,10 +150,46 @@ def LecHome():
             lecturer = cursor.fetchone()
 
             if lecturer:
-                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
+                # Fetch the S3 image URL based on emp_id
+                lec_image_file_name_in_s3 = "lec-id-" + str(lecturer[0]) + "_image_file"
+                s3 = boto3.client('s3')
+                bucket_name = custombucket
+
+                try:
+                    response = s3.generate_presigned_url('get_object',
+                                                 Params={'Bucket': bucket_name,
+                                                         'Key': lec_image_file_name_in_s3},
+                                                 ExpiresIn=1000)  # Adjust the expiration time as needed
+
+                except Exception as e:
+                    return str(e)
+
+                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
 
                 cursor.execute(select_sql, (lecturer[0],))
-                students = cursor.fetchall()
+                raw_students = cursor.fetchall()
+
+                # Process the raw data
+                students = {}
+                for row in raw_students:
+                    studId = row[0]
+                    if studId not in students:
+                        students[studId] = {
+                            'studentId': studId,
+                            'name': row[1],
+                            'programme': row[8],
+                            'email': row[6],
+                            'gender' : row[4],
+                            'hp' : row[3],
+                            'level' : row[7],
+                            'cohortId' : row[10],
+                            'company' : row[11],
+                            'compStatus' : row[12],
+                            'startDate': row[13],
+                            'endDate': row[14],
+                            'reports': []
+                        }
+                    students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
             
         except Exception as e:
             return str(e)
@@ -161,7 +197,7 @@ def LecHome():
         finally:   
             cursor.close()
 
-        return render_template('LecturerHome.html', lecturer=lecturer, students=students)
+        return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
     
     else:
         return render_template('LecturerLogin.html')
@@ -198,23 +234,116 @@ def LecStudentDetails():
 @app.route("/updateReportStatus", methods=['POST'])
 def LecUpdateReportStatus():
     if request.method == 'POST':
+        studId = request.form['studentId']
+        reportType = request.form['reportType']
+        remark = request.form['remark']
         if request.form['submit'] == 'approve':
             status = 'Approved'
         elif request.form['submit'] == 'reject':
             status = 'Rejected'
-    
-    return render_template('LecStudDetails.html')
+
+        if remark.strip():
+            update_sql = "UPDATE report SET status = %s, remark = %s WHERE student = %s AND reportType = %s"
+        else:
+            update_sql = "UPDATE report SET status = %s WHERE student = %s AND reportType = %s"
+        cursor = db_conn.cursor()
+
+        try:
+            if remark.strip():
+                cursor.execute(update_sql, (status,remark,studId,reportType,))
+            else:
+                cursor.execute(update_sql, (status,studId,reportType,))
+            db_conn.commit()
+
+        except Exception as e:
+            db_conn.rollback()
+            return str(e)
+        
+        finally:
+            cursor.close()
+
+    if 'loginLecturer' in session :
+        lectId = session['loginLecturer']
+
+        select_sql = "SELECT * FROM student WHERE supervisor = %s AND studentID = %s"
+        cursor = db_conn.cursor()
+
+        try:
+            cursor.execute(select_sql, (lectId,studId,))
+            student = cursor.fetchone()
+
+            if student:
+                select_sql = "SELECT * FROM report WHERE student = %s"
+
+                cursor.execute(select_sql, (studId,))
+                reports = cursor.fetchall()
+
+                return render_template('LecStudDetails.html', student=student, reports=reports)
+            
+        except Exception as e:
+            return str(e)
+
+        finally:   
+            cursor.close()
+
+    return render_template('LecturerLogin.html')
 
 # Download resume from S3 (based on Student Id)
-@app.route('/lecViewResume', methods=['GET', 'POST'])
-def LecViewResume():
+@app.route('/lecViewDoc', methods=['GET', 'POST'])
+def LecViewDoc():
     # Retrieve student's ID
     studId = request.args.get('studentId')
-    if not studId:
-        return "Student undefined"
+    type = request.args.get('type')
+
+    if not studId and not type:
+        return "Student undefined or Document error"
 
     # Construct the S3 object key
-    object_key = f"{studId}_resume"
+    if (type == 'resume'):
+        object_key = f"/resume/{studId}_resume"
+    elif (type == 'comAcc'):
+        object_key = f"/supportingDocument/{studId}"
+    elif (type == 'parentAck'):
+        object_key = f"/supportingDocument/{studId}"
+    elif (type == 'indemnity'):
+        object_key = f"/supportingDocument/{studId}"
+    elif (type == 'hiredEvi'):
+        object_key = f"/supportingDocument/{studId}"
+
+    # Generate a presigned URL for the S3 object
+    s3_client = boto3.client('s3')
+
+    try:
+        response = s3_client.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': custombucket,
+                'Key': object_key,
+                'ResponseContentDisposition': 'inline',
+            },
+            ExpiresIn=3600  # Set the expiration time (in seconds) as needed
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            # If the resume does not exist, return a page with a message
+            return render_template('LecStudDetails.html', msg='not found')
+        else:
+            return str(e)
+
+    # Redirect the user to the URL of the PDF file
+    return redirect(response)
+
+@app.route('/lecViewReport', methods=['GET', 'POST'])
+def LecViewReport():
+    # Retrieve student's ID
+    studId = request.args.get('studentId')
+    type = request.args.get('type')
+
+    if not studId and not type:
+        return "Student undefined or Document error"
+
+    # Construct the S3 object key
+    object_key = f"/progressReport/{studId}/{studId}_{type}"
 
     # Generate a presigned URL for the S3 object
     s3_client = boto3.client('s3')
@@ -238,6 +367,7 @@ def LecViewResume():
 
     # Redirect the user to the URL of the PDF file
     return redirect(response)
+
 
 @app.route("/fetchdata", methods=['POST'])
 def GetEmp():
