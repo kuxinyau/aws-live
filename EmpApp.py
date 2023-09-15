@@ -375,7 +375,7 @@ def LecViewReport():
             'get_object',
             Params={
                 'Bucket': custombucket,
-                'Key': object_key,
+                'Key': f"progressReport/{studId}/{studId}_{type}",
                 'ResponseContentDisposition': 'inline',
             },
             ExpiresIn=3600  # Set the expiration time (in seconds) as needed
@@ -383,7 +383,7 @@ def LecViewReport():
     except ClientError as e:
         if e.response['Error']['Code'] == 'NoSuchKey':
             # If the resume does not exist, return a page with a message
-            return render_template('LecStudDetails.html', msg='no resume found')
+            return render_template('LecStudDetails.html', msg='no found')
         else:
             return str(e)
 
