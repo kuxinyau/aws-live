@@ -116,12 +116,35 @@ def LoginLec():
                 except Exception as e:
                     return str(e)
 
-                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
+                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
 
                 cursor.execute(select_sql, (lecturer[0],))
-                students = cursor.fetchall()
+                raw_students = cursor.fetchall()
 
-                return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
+                # Process the raw data
+                students = {}
+                for row in raw_students:
+                    studId = row[0]
+                    if studId not in students:
+                        students[studId] = {
+                            'studentId': studId,
+                            'name': row[1],
+                            'programme': row[8],
+                            'email': row[6],
+                            'gender' : row[4],
+                            'hp' : row[3],
+                            'level' : row[7],
+                            'cohortId' : row[10],
+                            'company' : row[11],
+                            'compStatus' : row[12],
+                            'startDate': row[13],
+                            'endDate': row[14],
+                            'reports': []
+                        }
+                    students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
+                print(students)
+                print(students.reports.count)
+                return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=students.reports.count, image_url=response)
             
         except Exception as e:
             return str(e)
@@ -196,9 +219,8 @@ def LecHome():
 
         finally:   
             cursor.close()
-        print(students)
-        print(students[12].count)
-        return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=students[12].count, image_url=response)
+        
+        return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=students.reports.count, image_url=response)
     
     else:
         return render_template('LecturerLogin.html')
