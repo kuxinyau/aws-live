@@ -247,7 +247,7 @@
                                     style="font-size: 150px;"></iconify-icon></a></div>
                         <div>
                             {% if report[3] != 'pending' %}
-                            <div style="padding-bottom: 10px;">
+                            <div style="padding-bottom: 15px;">
                                 Submitted Date : {{ report[1] }}
                                 {% if report[4] == 1 %}
                                 <span style="color: #FFA500;">(late)</span>
@@ -256,7 +256,7 @@
                             {% endif %}
                             {% if report[3] == 'submitted' %}
                             <form action="/updateReportStatus" method="POST" enctype="multipart/form-data">
-                                <div style="padding-bottom: 10px;">
+                                <div style="padding-bottom: 15px;">
                                     Remark
                                     <div class="remarkForm"><textarea name="remark" rows="4" cols="45"
                                             class="remark"></textarea></div>
