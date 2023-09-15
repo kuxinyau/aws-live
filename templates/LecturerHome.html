@@ -206,7 +206,7 @@
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
                     {% set ns = namespace(current_level=None, current_cohort=None) %}
 
-                    {% for studId, student in students.item() %}
+                    {% for studId, student in students.items() %}
                     {% if student['level'] != ns.current_level %}
                     <tr>
                         <th colspan="14" style="background-color: #187bcd;">{{ student['level'] }}</th>
