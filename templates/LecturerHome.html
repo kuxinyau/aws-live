@@ -206,24 +206,24 @@
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
                     {% set ns = namespace(current_level=None, current_cohort=None) %}
 
-                    {% for student in students %}
-                    {% if student.level != ns.current_level %}
+                    {% for studId, student in students.item() %}
+                    {% if student['level'] != ns.current_level %}
                     <tr>
-                        <th colspan="14" style="background-color: #187bcd;">{{ student.level }}</th>
+                        <th colspan="14" style="background-color: #187bcd;">{{ student['level'] }}</th>
                     </tr>
                     <tr>
                         <td colspan="14" style="background-color: white;"></td>
                     </tr>
                     {% endif %}
 
-                    {% set ns.current_level = student.level %}
-                    {% if student.cohortId != ns.current_cohort %}
+                    {% set ns.current_level = student['level'] %}
+                    {% if student['cohortId'] != ns.current_cohort %}
                     <tr>
                         <td colspan="14" style="background-color: white;"></td>
                     </tr>
                     <tr>
                         <td colspan="14" style="background-color: #003057; color: whitesmoke;">Internship Period : {{
-                            student.startDate }} to {{ student.endDate }}</td>
+                            student['startDate'] }} to {{ student['endDate'] }}</td>
                     </tr>
                     <tr>
                         <th width="1%"></th>
@@ -235,46 +235,46 @@
                         <th width="15%">Company</th>
                         <th colspan="{{ noReport }}" width="10%">Report</th>
                     </tr>
-                    {% set ns.current_cohort = student.cohortId %}
+                    {% set ns.current_cohort = student['cohortId'] %}
                     {% endif %}
                     <tr>
                         <td>
-                            {% if student.gender == 'M' %}
+                            {% if student['gender'] == 'M' %}
                             <div style="color: #187bcd; font-size: 24px;"><iconify-icon
                                     icon="fa-solid:male"></iconify-icon></div>
-                            {% elif student.gender == 'F' %}
+                            {% elif student['gender'] == 'F' %}
                             <div style="color: #f5347f; font-size: 24px;"><iconify-icon
                                     icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
-                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{
-                                student.studentId }}</a></td>
-                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{
-                                student.name }}</a></td>
-                        <td>{{ student.programme }}</td>
-                        <td>{{ student.email }}</td>
-                        <td>{{ student.hp }}</td>
-                        <td>{{ student.company }}</td>
+                        <td><a href="{{ url_for('LecStudentDetails', studentId=student['studentId']) }}" class="idUrl">{{
+                                student['studentId'] }}</a></td>
+                        <td><a href="{{ url_for('LecStudentDetails', studentId=student['studentId']) }}" class="idUrl">{{
+                                student['name'] }}</a></td>
+                        <td>{{ student['programme'] }}</td>
+                        <td>{{ student['email'] }}</td>
+                        <td>{{ student['hp'] }}</td>
+                        <td>{{ student['company'] }}</td>
                         
-                        {% for report in student.reports %}
+                        {% for report in student['reports'] %}
                         <td>
-                            {% if report.reportLate == 1 %}
+                            {% if report['reportLate'] == 1 %}
                             <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #FFA500;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
-                            {% elif report.reportStatus == 'submitted' %}
+                            {% elif report['reportStatus'] == 'submitted' %}
                             <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: blue;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
-                            {% elif report.reportStatus == 'approved' %}
+                            {% elif report['reportStatus'] == 'approved' %}
                             <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: green;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
-                            {% elif report.reportStatus == 'rejected' %}
+                            {% elif report['reportStatus'] == 'rejected' %}
                             <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: red;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
-                            {% elif report.reportStatus == 'pending' %}
+                            {% elif report['reportStatus'] == 'pending' %}
                             <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #808080;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
