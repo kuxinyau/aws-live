@@ -259,10 +259,10 @@ def LecUpdateReportStatus():
         studId = request.form['studentId']
         reportType = request.form['reportType']
         remark = request.form['remark']
-        if request.form['status'] == 'approve':
-            status = 'Approved'
-        elif request.form['status'] == 'reject':
-            status = 'Rejected'
+        if request.form['status'] == 'Approve':
+            status = 'approved'
+        elif request.form['status'] == 'Reject':
+            status = 'rejected'
 
         if remark.strip():
             update_sql = "UPDATE report SET status = %s, remark = %s WHERE student = %s AND reportType = %s"

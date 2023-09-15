@@ -246,7 +246,7 @@
                                 class="idUrl"><iconify-icon icon="iwwa:file-pdf"
                                     style="font-size: 150px;"></iconify-icon></a></div>
                         <div>
-                            {% if report[3] == 'submitted' %}
+                            {% if report[3] != 'pending' %}
                             <div style="padding-bottom: 10px;">
                                 Submitted Date : {{ report[1] }}
                                 {% if report[4] == 1 %}
@@ -259,8 +259,8 @@
                                     <div class="remarkForm"><textarea name="remark" rows="4" cols="45"
                                             class="remark"></textarea></div>
                                 </div>
-                                <input type="submit" name="status" value="approve" class="btn btn-success" style="font-size: 14px;" />
-                                <input type="submit" name="status" value="reject" class="btn btn-danger" style="font-size: 14px;" />
+                                <input type="submit" name="status" value="Approve" class="btn btn-success" style="font-size: 14px;" />
+                                <input type="submit" name="status" value="Reject" class="btn btn-danger" style="font-size: 14px;" />
                                 <input type="hidden" value="{{ report[2] }}" name="reportType" />
                                 <input type="hidden" value="{{ student[0] }}" name="studentId" />
                             </form>
