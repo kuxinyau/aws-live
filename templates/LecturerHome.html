@@ -233,7 +233,7 @@
                         <th width="10%">Email</th>
                         <th width="5%">HP</th>
                         <th width="15%">Company</th>
-                        <th colspan="7" width="10%">Report</th>
+                        <th colspan="{{ noReport }}" width="10%">Report</th>
                     </tr>
                     {% set ns.current_cohort = student.cohortId %}
                     {% endif %}
@@ -280,6 +280,7 @@
                             </a>
                             {% endif %}
                         </td>
+                        {% endfor %}
                     </tr>
                     {% endfor %}
                 </table>
