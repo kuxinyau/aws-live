@@ -196,8 +196,9 @@ def LecHome():
 
         finally:   
             cursor.close()
-
-        return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=students[13].count, image_url=response)
+        print(students)
+        print(students[12].count)
+        return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=students[12].count, image_url=response)
     
     else:
         return render_template('LecturerLogin.html')
