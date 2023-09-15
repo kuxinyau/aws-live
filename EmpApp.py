@@ -101,12 +101,27 @@ def LoginLec():
 
             if lecturer:
                 session['loginLecturer'] = lecturer[0]
-                select_sql = "SELECT * FROM student WHERE supervisor = %s"
+
+                # Fetch the S3 image URL based on emp_id
+                lec_image_file_name_in_s3 = "lec-id-" + str(lecturer[0]) + "_image_file"
+                s3 = boto3.client('s3')
+                bucket_name = custombucket
+
+                try:
+                    response = s3.generate_presigned_url('get_object',
+                                                 Params={'Bucket': bucket_name,
+                                                         'Key': lec_image_file_name_in_s3},
+                                                 ExpiresIn=1000)  # Adjust the expiration time as needed
+
+                except Exception as e:
+                    return str(e)
+
+                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 students = cursor.fetchall()
 
-                return render_template('LecturerHome.html', lecturer=lecturer, students=students)
+                return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
             
         except Exception as e:
             return str(e)
@@ -135,7 +150,7 @@ def LecHome():
             lecturer = cursor.fetchone()
 
             if lecturer:
-                select_sql = "SELECT * FROM student WHERE supervisor = %s"
+                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 students = cursor.fetchall()

@@ -35,10 +35,29 @@
             /* Smooth color transition on hover */
         }
 
+        .footerRow {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 21px;
+            font-weight: 300;
+            line-height: 1.4;
+            margin-left: 190px;
+            margin-right: 190px;
+        }
+
+        footer {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.4;
+            margin-left: 190px;
+            margin-right: 190px;
+        }
+
         .panel-main {
             border: 1px solid #ddd;
             border-radius: 5px;
-            margin: 20px 0px;
+            margin: 20px 10px;
+            width: 47%;
         }
 
         .panel-main .panel-header {
@@ -71,14 +90,14 @@
             background-color: #ddd;
         }
 
-        #students .idUrl {
+        .idUrl {
             color: #005295;
             text-decoration: none;
             cursor: pointer;
         }
 
-        #students .idUrl:hover,
-        #students .idUrl:active {
+        .idUrl:hover,
+        .idUrl:active {
             color: #187bcd;
             text-decoration: none;
         }
@@ -98,16 +117,51 @@
             padding-right: 50px;
             margin-bottom: 0px;
         }
+
+        .remark {
+            width: 100%;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            resize: none;
+        }
     </style>
+    <script>
+        function adjustTextareaCols(textarea) {
+            // Get references to the div and textarea elements
+            var container = textarea.parentNode;
+
+            // Calculate the number of characters that can fit within the div's width
+            var containerWidth = container.offsetWidth;
+            var charWidth = parseFloat(getComputedStyle(textarea).width) / textarea.cols;
+            var cols = Math.floor(containerWidth / charWidth);
+
+            // Set the cols attribute of the textarea
+            textarea.cols = cols;
+        }
+
+        function adjustAllTextareas() {
+            var textareas = document.querySelectorAll('.remark');
+            textareas.forEach(function (textarea) {
+                adjustTextareaCols(textarea);
+            });
+        }
+
+        // Call the adjustAllTextareas function when the page loads and when it resizes
+        window.addEventListener('load', adjustAllTextareas);
+        window.addEventListener('resize', adjustAllTextareas);
+    </script>
 </head>
 
 <body>
     <nav>
         <div class="homeNav">
-            <a href="#">Home</a>
+            <a href="/lecHome">Home</a>
         </div>
         <div class="otherNav">
-            <a href="#">Log Out</a>
+            <a href="/logoutlec">Log Out</a>
         </div>
     </nav>
 
@@ -161,43 +215,65 @@
             <!-- show supporting document -->
             <div style="margin-right: 150px; border: 2px solid #005295; border-radius: 5px;">
                 <div style="padding: 10px;">
-                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank">Resume</a></div>
-                    <div>Company Acceptance Form<a href=""></a></div>
-                    <div>Parent Acknowledgement Form</div>
-                    <div>Letter of Indemnity</div>
-                    <div>Hired Evidence</div>
+                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                            class="idUrl">Resume</a></div>
+                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                            class="idUrl">Company Acceptance Form id_StudF05</a></div>
+                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                            class="idUrl">Parent Acknowledgement Form</a></div>
+                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                            class="idUrl">Letter of Indemnity</a></div>
+                    <div><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                            class="idUrl">Hired Evidence</a></div>
                 </div>
             </div>
         </div>
 
         <!-- Report -->
         {% if reports %}
-        <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+        <div
+            style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; font-size: 14px;">
             {% for report in reports %}
             <div class="panel-main">
                 <div class="panel-header">
                     <div>{{ report[2] }} [Due: ]</div>
-                    <div>></div>
+                    <div></div>
                 </div>
                 <div style="padding: 15px;">
-                    <div>
-                        <form action="/updateReportStatus" method="POST">
-                            <div>Status
-                                <input type="submit" value="Approve" class="btn btn-success">
-                                <input type="submit" value="Reject" class="btn btn-danger">
+                    <div style="display: flex;">
+                        <div style="padding: 0px 20px 0px 10px;"><a
+                                href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"
+                                class="idUrl"><iconify-icon icon="iwwa:file-pdf"
+                                    style="font-size: 150px;"></iconify-icon></a></div>
+                        <div>
+                            <div style="padding-bottom: 10px;">
+                                Submitted Date : {{ report[1] }}
+                                {% if report[4] == 1 %}
+                                <span style="color: yellow;">(late)</span>
+                                {% endif %}
                             </div>
-                        </form>
-                        <div>
-                            Report <iconify-icon icon="iwwa:file-pdf"></iconify-icon>
-                        </div>
-                        <div>
-                            Submitted Date : {{ report[1] }}
-                        </div>
-                        <div>
-                            Remark
-                            <form action="/updateReportRemark" method="POST">
-                                <textarea name="remark" rows="5" cols="50"></textarea>
+                            {% if report[3] == 'submitted' %}
+                            <form action="/updateReportStatus" method="POST">
+                                <div style="padding-bottom: 10px;">
+                                    Remark
+                                    <div class="remarkForm"><textarea name="remark" rows="4" cols="45"
+                                            class="remark"></textarea></div>
+                                </div>
+                                <input type="submit" value="Approve" class="btn btn-success" style="font-size: 14px;">
+                                <input type="submit" value="Reject" class="btn btn-danger" style="font-size: 14px;">
                             </form>
+                            {% else %}
+                            {% if report[5] %}
+                            <div style="padding-bottom: 10px;">
+                                Remark <div>{{ report[5] }}</div>
+                            </div>
+                            {% endif %}
+                            {% if report[3] == 'approved'%}
+                            <div class="btn btn-success" style="font-size: 14px; cursor: default;">Approved</div>
+                            {% elif report[3] == 'reject' %}
+                            <div class="btn btn-danger" style="font-size: 14px; cursor: default;">Rejected</div>
+                            {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>

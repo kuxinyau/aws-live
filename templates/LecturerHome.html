@@ -35,6 +35,24 @@
             /* Smooth color transition on hover */
         }
 
+        .footerRow {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 21px;
+            font-weight: 300;
+            line-height: 1.4;
+            margin-left: 190px;
+            margin-right: 190px;
+        }
+
+        footer {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.4;
+            margin-left: 190px;
+            margin-right: 190px;
+        }
+
         .form {
             width: 100%;
             display: flex;
@@ -78,12 +96,18 @@
             color: white;
         }
 
-        #students td, #students th {
+        #students td,
+        #students th {
             padding: 5px;
         }
 
-        #students tr:nth-child(even){background-color: #f2f2f2;}
-        #students tr:hover {background-color: #ddd;}
+        #students tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #students tr:hover {
+            background-color: #ddd;
+        }
 
         #students .idUrl {
             color: #005295;
@@ -91,7 +115,8 @@
             cursor: pointer;
         }
 
-        #students .idUrl:hover, #students .idUrl:active {
+        #students .idUrl:hover,
+        #students .idUrl:active {
             color: #187bcd;
             text-decoration: none;
         }
@@ -119,20 +144,25 @@
                 <div>Profile</div>
                 <div>
                     <form action="/fetchdata" autocomplete="on" method="POST">
-                        <input  type="hidden" name="lec_id" value="{{ lecturer[0] }}" autofocus size="40">
+                        <input type="hidden" name="lec_id" value="{{ lecturer[0] }}" autofocus size="40">
                         <button type="submit" class="btn btn-outline-secondary">Edit</button>
                     </form>
                 </div>
             </div>
             <div style="padding: 15px;">
                 <div>
+                    <img src="{{ image_url }}" alt="No Profile Picture" />
+                </div>
+                <div>
                     <div class="form">
                         <div class="form-label">Name</div>
                         <div class="form-data">
                             {% if lecturer[3] == 'M' %}
-                            <span style="color: #187bcd; font-size: 16px;"><iconify-icon icon="fa-solid:male"></iconify-icon></span>
+                            <span style="color: #187bcd; font-size: 16px;"><iconify-icon
+                                    icon="fa-solid:male"></iconify-icon></span>
                             {% elif lecturer[3] == 'F' %}
-                            <span style="color: #f5347f; font-size: 16px;"><iconify-icon icon="fa-solid:female"></iconify-icon></span>
+                            <span style="color: #f5347f; font-size: 16px;"><iconify-icon
+                                    icon="fa-solid:female"></iconify-icon></span>
                             {% endif %} {{ lecturer[2] }}
                         </div>
                     </div>
@@ -152,22 +182,40 @@
         <div class="panel-main">
             <div class="panel-header">
                 <div>Students</div>
-                <form action="/displayStudent" autocomplete="on" method="POST">                                                        
-                    <button type="submit" name="action" value="pickUp" class="btn btn-outline-secondary">Pick Up</button> 
+                <form action="/displayStudent" autocomplete="on" method="POST">
+                    <button type="submit" name="action" value="pickUp" class="btn btn-outline-secondary">Pick
+                        Up</button>
                     <button type="submit" name="action" value="drop" class="btn btn-outline-secondary">Drop</button>
                     <input type="hidden" name="lec_id" value="{{ lecturer[0] }}">
-              </form>
+                </form>
             </div>
-            
+
             <div style="padding: 15px;">
                 {% if not students %}
                 <div>Not found any supervised student</div>
                 {% else %}
                 <table id="students" style="width: 100%; font-size: 14px; border-collapse: collapse;">
-                    <tr><th colspan="14" style="background-color: #187bcd;">{{ level }}</th></tr>
-                    <tr><td colspan="14" style="background-color: white;"></td></tr>
-                    <tr><td colspan="14" style="background-color: white;"></td></tr>
-                    <tr><td colspan="14" style="background-color: #003057; color: whitesmoke;">Internship Period : {{ startDate }} - {{ endDate }}</td></tr>
+                    {% set ns = namespace(current_level=None, current_cohort=None) %}
+
+                    {% for student in students %}
+                    {% if student[7] != ns.current_level %}
+                    <tr>
+                        <th colspan="14" style="background-color: #187bcd;">{{ student[7] }}</th>
+                    </tr>
+                    <tr>
+                        <td colspan="14" style="background-color: white;"></td>
+                    </tr>
+                    {% endif %}
+
+                    {% set ns.current_level = student[7] %}
+                    {% if student[10] != ns.current_cohort %}
+                    <tr>
+                        <td colspan="14" style="background-color: white;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="14" style="background-color: #003057; color: whitesmoke;">Internship Period : {{
+                            student[13] }} until {{ student[14] }}</td>
+                    </tr>
                     <tr>
                         <th width="1%"></th>
                         <th width="2%">ID</th>
@@ -178,35 +226,47 @@
                         <th width="15%">Company</th>
                         <th colspan="7" width="10%">Report</th>
                     </tr>
-                    {% for student in students %}
+                    {% set ns.current_cohort = student[10] %}
+                    {% endif %}
                     <tr>
                         <td>
                             {% if student[4] == 'M' %}
-                            <div style="color: #187bcd; font-size: 24px;"><iconify-icon icon="fa-solid:male"></iconify-icon></div>
+                            <div style="color: #187bcd; font-size: 24px;"><iconify-icon
+                                    icon="fa-solid:male"></iconify-icon></div>
                             {% elif student[4] == 'F' %}
-                            <div style="color: #f5347f; font-size: 24px;"><iconify-icon icon="fa-solid:female"></iconify-icon></div>
+                            <div style="color: #f5347f; font-size: 24px;"><iconify-icon
+                                    icon="fa-solid:female"></iconify-icon></div>
                             {% endif %}
                         </td>
-                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ student[0] }}</a></td>
-                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{ student[1] }}</a></td>
+                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{
+                                student[0] }}</a></td>
+                        <td><a href="{{ url_for('LecStudentDetails', studentId=student[0]) }}" class="idUrl">{{
+                                student[1] }}</a></td>
                         <td>{{ student[8] }}</td>
                         <td>{{ student[6] }}</td>
                         <td>{{ student[3] }}</td>
-                        <td>{{ student }}</td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
-                        <td><i class="fa fa-file-pdf-o"></i></td>
+                        <td>{{ student[11] }}</td>
+                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
+                                    class="fa fa-file-pdf-o"></i></a></td>
+                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
+                                    class="fa fa-file-pdf-o"></i></a></td>
+                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
+                                    class="fa fa-file-pdf-o"></i></a></td>
+                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
+                                    class="fa fa-file-pdf-o"></i></a></td>
+                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
+                                    class="fa fa-file-pdf-o"></i></a></td>
+                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
+                                    class="fa fa-file-pdf-o"></i></a></td>
+                        <td><a href="{{ url_for('LecViewResume', studentId=student[0]) }}" target="_blank"><i
+                                    class="fa fa-file-pdf-o"></i></a></td>
                     </tr>
                     {% endfor %}
                 </table>
                 {% endif %}
             </div>
         </div>
-        
+
         <hr>
         <footer>
             <p>© 2023 - TAR UMT FOCS ITP</p>
