@@ -186,7 +186,7 @@ def LecHome():
                 except Exception as e:
                     return str(e)
 
-                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC"
+                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 raw_students = cursor.fetchall()
@@ -322,15 +322,15 @@ def LecViewDoc():
 
     # Construct the S3 object key
     if (type == 'resume'):
-        object_key = f"/resume/{studId}_resume"
+        object_key = f"resume/{studId}_resume"
     elif (type == 'comAcc'):
-        object_key = f"/supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}"
     elif (type == 'parentAck'):
-        object_key = f"/supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}"
     elif (type == 'indemnity'):
-        object_key = f"/supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}"
     elif (type == 'hiredEvi'):
-        object_key = f"/supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}"
 
     # Generate a presigned URL for the S3 object
     s3_client = boto3.client('s3')
@@ -365,7 +365,7 @@ def LecViewReport():
         return "Student undefined or Document error"
 
     # Construct the S3 object key
-    object_key = f"/progressReport/{studId}/{studId}_{type}"
+    object_key = f"progressReport/{studId}/{studId}_{type}"
 
     # Generate a presigned URL for the S3 object
     s3_client = boto3.client('s3')
