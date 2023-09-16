@@ -147,7 +147,7 @@ def LoginLec():
                     return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[raw_students[0][0]]['reports']), image_url=response)
                 
                 else:
-                    return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
+                    return render_template('LecturerHome.html', lecturer=lecturer, students=raw_students, image_url=response)
 
         except Exception as e:
             return str(e)
@@ -218,7 +218,7 @@ def LecHome():
                             }
                         students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
                 else:
-                    return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
+                    return render_template('LecturerHome.html', lecturer=lecturer, students=raw_students, image_url=response)
         except Exception as e:
             return str(e)
 
@@ -855,6 +855,10 @@ def FilterPickedStudent():
 def login_admin():
     return render_template('LoginAdmin.html')
 
+@app.route("/logoutAdmin")
+def LogoutLec():
+    return render_template('home.html')
+
 @app.route("/loginAdmin", methods=['GET','POST'])
 def loginAdmin():
     if request.method == 'POST':
@@ -1087,9 +1091,6 @@ def FilterRequest():
 
     finally:
         cursor.close()
-
-    
-
 
     return render_template('AdminDashboard.html', request_list=request_list,programme_list=filterProgramme(),cohort_list=filterCohort(),level_list=filterLevel())
 
