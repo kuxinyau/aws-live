@@ -345,7 +345,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drop Student</title>
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css')}}" />
 
     <nav>
@@ -353,19 +353,19 @@
             <a href="/">Home</a>
         </div>
         <div class="otherNav">
-            <a href="#">Company</a>
-            <a href="#">Uni Supervisor</a>
-            <a href="#">Admin</a>
-            <a href="/login_student">Student</a>
+            <a href="/displayCompany">Company Registration</a>
+			<a href="#">Student Profile Update Request</a>
+			<a href="/logoutAdmin">Logout</a>
         </div>
     </nav>
 </head>
 
 <body>
-    <h1 class="internship-header">Drop Student</h1>    
+    <h1 class="internship-header">Student Edit Profile Request</h1>
+   
         <div class="overall">
             <div class="div-line">
-                <form action="/filterPickedStudent" autocomplete="on" method="post">
+                <form action="/filterRequest" autocomplete="on" method="post">
                     <div class="job-search-filter">
                         <div class="group-search-company">
                             <label class="label-search-company">Level</label>
@@ -373,9 +373,20 @@
                                 <option value="All">All</option>
                                 {% for level in level_list %}     
                                 <option value="{{level.level}}">{{level.level}}</option>
-                                {% endfor %}
+                                {% endfor %}                       
                             </select>
-                        </div>                    
+                        </div>
+                        
+                        <div class="group-search-company">
+                            <label class="label-search-company">Attribute</label>
+                            <select name="search-attribute">    
+                                <option value="All">All</option>                            
+                                <option value="studentName">Name</option>
+                                <option value="mobileNumber">Mobile Number</option>
+                                <option value="IC">IC</option>
+                                <option value="address">Address</option>                          
+                            </select>
+                        </div>
 
                         <div class="group-search-title">
                             <label class="label-search-title">Programme</label>
@@ -400,7 +411,6 @@
 
                         <div class-group-button>
                             <button type="submit" name="button-filter" class="confirm-filter-company">Filter</button>
-                            <input type="hidden" name="lec_id" value="{{ session['loginLecturer'] }}">
                         </div>
                     </div>
                 </form>
@@ -414,64 +424,55 @@
             justify-content: flex-start;
         "> 
                 <div>
-                    <form action="/drop" autocomplete="on" method="POST" enctype="multipart/form-data">  
+                    <form action="/approveReq" autocomplete="on" method="POST" enctype="multipart/form-data">  
                         <table>
                             <thead>
                                 <tr>
-                                    <td></td>
-                                    <td>ID</td>
-                                    <td>Name</td>
-                                    <td>Gender</td>
-                                    <td>Email</td>
-                                    <td>Level</td>
-                                    <td>Programme</td>
-                                    <td>Cohort</td>
+                                <td></td>
+                                <td>Request ID</td>
+                                <td>Attribue</td>
+                                <td>Change</td>
+                                <td>Reason</td>
+                                <td>Student ID</td>
                                 </tr>
                             </thead>
                             <tbody>
-                            
-                                <input  type="hidden" name="lec_id" value="{{ session['loginLecturer'] }}" >
-                                {% if student_list %}
-                                    {% for student in student_list %}
+                    
+                                {% if request_list %}
+                                {% for request in request_list %}
                                     <tr>
                                         <td>
-                                            <input type="checkbox" name="selected_students[]" value="{{ student.student_id }}">
+                                            <input type="checkbox" name="selected_requests[]" value="{{ request.id }}">
                                         </td>
-                                        <input type="hidden" name="selected_studentsNames[]" value="{{ student.name }}">
-                                        <td> {{ student.student_id }}</td>
-                                        <td> {{ student.name }}</td>
-                                        <td> {{ student.gender }}</td>
-                                        <td> {{ student.email }}</td>
-                                        <td> {{ student.level }}</td>
-                                        <td> {{ student.programme }}</td>
-                                        <td> {{ student.cohort }}</td>
+                                        
+                                        <td>{{ request.id }}</td>
+                                        <td>{{ request.attribute }}</td>
+                                        <input type="hidden" name="selected_attribute[]" value="{{ request.attribute }}">
+                                        <td>{{ request.change }}</td>
+                                        <input type="hidden" name="selected_change[]" value="{{ request.change }}">
+                                        <td>{{ request.reason }}</td>
+                                        <td>{{ request.studentId }}</td>
+                                        <input type="hidden" name="selected_studentId[]" value="{{ request.studentId }}">
                                     </tr>
                                     {% endfor %}
                                     <tr>
                                         <td colspan="8" style="text-align: center;">
-                                            <button type="submit" name="button-filter" style="background-color: #54585d;">Drop</button>
+                                            <button type="submit" name="action" value="approve" style="background-color: #54585d; width: 120px;"> Approve </button>
+                                            <button type="submit" name="action" value="reject" style="background-color: #0a0a0a; width: 120px;" >Reject</button>
                                         </td>
                                         
                                     </tr>
                                     {% else %}                      
                                     <tr>
-                                        <td colspan="8" style="text-align: center;">No student record</td>
+                                        <td colspan="8" style="text-align: center;">No request record</td>
                                     </tr>
         
                                     
-                                {% endif %}
+                                {% endif %}            
                             </tbody>
                         </table>
                     </form>
                 </div>
-            
-        
-                <div>
-                    <form action="/lecHome" autocomplete="on" method="GET" enctype="multipart/form-data">                                                                                
-                        <br><button type="submit" name="button-back">Back</button>
-                    
-                    </form>  
-                </div>    
              </div> 
             
         </div>

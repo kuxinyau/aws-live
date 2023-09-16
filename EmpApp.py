@@ -324,13 +324,13 @@ def LecViewDoc():
     if (type == 'resume'):
         object_key = f"resume/{studId}_resume"
     elif (type == 'comAcc'):
-        object_key = f"supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}/{studId}_acceptanceForm"
     elif (type == 'parentAck'):
-        object_key = f"supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}/{studId}_acknowledgementForm"
     elif (type == 'indemnity'):
-        object_key = f"supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}/{studId}_indemnityLetter"
     elif (type == 'hiredEvi'):
-        object_key = f"supportingDocument/{studId}"
+        object_key = f"supportingDocument/{studId}/{studId}_hiredEvidence"
 
     # Generate a presigned URL for the S3 object
     s3_client = boto3.client('s3')
@@ -391,9 +391,10 @@ def LecViewReport():
     return redirect(response)
 
 
+
 @app.route("/fetchdata", methods=['POST'])
 def GetEmp():
-    lec_id = request.form['lec_id']
+    lec_id = session['loginLecturer']
     select_sql = "SELECT * FROM lecturer WHERE lectId = %s"
     cursor = db_conn.cursor()
 
@@ -446,7 +447,7 @@ def GetEmp():
 
 @app.route("/editlec", methods=['POST'])
 def UpdateEmp():
-    lec_id = request.form['lec_id']
+    lec_id = session['loginLecturer']
     password = request.form['password']
     name = request.form['name']
     gender = request.form['gender']
@@ -504,7 +505,7 @@ def UpdateEmp():
 def GetStudent():
     
     action=request.form['action']
-    id=request.form['lec_id']
+    id=session['loginLecturer']
 
     if action == 'drop':
         select_sql = f"SELECT * FROM student WHERE supervisor LIKE '%{id}%'"
@@ -529,18 +530,7 @@ def GetStudent():
             programme = student[8]
             cohort = student[10]
 
-            # Fetch the S3 image URL based on student_id
-            stu_image_file_name_in_s3 = "stu-id-" + str(student_id) + "_image_file"
-            s3 = boto3.client('s3')
-            bucket_name = custombucket
-
-            try:
-                response = s3.generate_presigned_url('get_object',
-                                                     Params={'Bucket': bucket_name,
-                                                             'Key': stu_image_file_name_in_s3},
-                                                     ExpiresIn=1000)  # Adjust the expiration time as needed
-
-                # Create a dictionary for each student with their details and image URL
+            try:            
                 student_data = {
                     "student_id": student_id,
                     "name": name,
@@ -559,10 +549,10 @@ def GetStudent():
                 return str(e)       
          
         if action == 'drop':
-         return render_template('DropStudent.html', student_list=student_list,id=id)
+         return render_template('DropStudent.html', student_list=student_list,id=id,programme_list=filterProgramme(),cohort_list=filterCohort(),level_list=filterLevel())
 
         if action =='pickUp': 
-         return render_template('PickUpStudent.html', student_list=student_list)
+         return render_template('PickUpStudent.html',id=id, student_list=student_list,programme_list=filterProgramme(),cohort_list=filterCohort(),level_list=filterLevel())
 
     except Exception as e:
         return str(e)
@@ -570,12 +560,11 @@ def GetStudent():
     finally:
         cursor.close()
 
-
 @app.route("/pickUp" ,methods=['GET','POST'])
 def PickStudent():
     selected_student_ids = request.form.getlist('selected_students[]')
     #selected_student_name = request.form.getlist('selected_studentsNames[]')
-    lec_id = request.form['lec_id']
+    lec_id = session['loginLecturer']
     #student_id = request.form['student_id']
     #name = request.form['name']
     #gender = request.form['gender']
@@ -588,18 +577,62 @@ def PickStudent():
     update_sql = "UPDATE student SET supervisor=%s WHERE studentId=%s"
     cursor = db_conn.cursor()    
 
+    student_list=[]
+    
     try:
         # Check if the employee exists
         for student_id in selected_student_ids:
             update_sql = "UPDATE student SET supervisor=%s WHERE studentId=%s"
             cursor = db_conn.cursor()    
             cursor.execute(update_sql, (lec_id,student_id))
-            db_conn.commit()                    
+            db_conn.commit()   
+
+                         
 
     finally:
         cursor.close()
     
-    return render_template('PickedUpOutput.html', student_list=selected_student_ids)
+    
+    cursor = db_conn.cursor()
+    student_list = []
+
+    try:
+        
+        for student_id in selected_student_ids:
+            select_sql ="SELECT * FROM student WHERE supervisor= %s and studentId = %s "
+            cursor.execute(select_sql,(lec_id,student_id))
+            students = cursor.fetchall()  # Fetch all students
+                       
+
+            for student in students:
+                student_id = student[0]
+                name = student[1]
+                gender = student[4]
+                email = student[6]
+                level = student[7]
+                programme = student[8]
+                cohort = student[10]           
+                try:               
+                    student_data = {
+                        "student_id": student_id,
+                        "name": name,
+                        "gender": gender,
+                        "email": email,
+                        "level": level,
+                        "programme": programme,
+                        "cohort": cohort,
+                    }
+
+                    # Append the student's dictionary to the student_list
+                    student_list.append(student_data)
+                    
+
+                except Exception as e:
+                    return str(e)       
+                
+    except Exception as e:
+        return str(e)
+    return render_template('PickedUpOutput.html', student_list=student_list)
 
 @app.route("/drop" ,methods=['GET','POST'])
 def DropStudent():
@@ -615,6 +648,8 @@ def DropStudent():
     
     update_sql = "UPDATE student SET supervisor='' WHERE studentId=%s"
     cursor = db_conn.cursor()    
+    student_list=[]
+
     try:       
         for student_id in selected_student_ids:
             update_sql = "UPDATE student SET supervisor = NULL WHERE studentId=%s"
@@ -625,7 +660,44 @@ def DropStudent():
     finally:
         cursor.close()
     
-    return render_template('DropOutput.html', student_list=selected_student_name)
+    cursor = db_conn.cursor()
+    try:
+        
+        for student_id in selected_student_ids:
+            select_sql ="SELECT * FROM student WHERE studentId = %s "
+            cursor.execute(select_sql,(student_id))
+            students = cursor.fetchall()  # Fetch all students
+                       
+
+            for student in students:
+                student_id = student[0]
+                name = student[1]
+                gender = student[4]
+                email = student[6]
+                level = student[7]
+                programme = student[8]
+                cohort = student[10]           
+                try:               
+                    student_data = {
+                        "student_id": student_id,
+                        "name": name,
+                        "gender": gender,
+                        "email": email,
+                        "level": level,
+                        "programme": programme,
+                        "cohort": cohort,
+                    }
+
+                    # Append the student's dictionary to the student_list
+                    student_list.append(student_data)
+                    
+
+                except Exception as e:
+                    return str(e)       
+                
+    except Exception as e:
+        return str(e)
+    return render_template('DropOutput.html', student_list=student_list)
 
 @app.route("/filterStudent" ,methods=['GET','POST'])
 def FilterStudent():
@@ -637,11 +709,11 @@ def FilterStudent():
     select_sql = "SELECT * FROM student WHERE supervisor IS NULL"
     cursor = db_conn.cursor()
 
-    if level !='All':
+    if level != 'All':
           select_sql += f" AND level LIKE '%{level}%'"
-    if programme:
+    if programme !='All':
           select_sql += f" AND programme LIKE '%{programme}%'"
-    if level:
+    if cohort !='All':
           select_sql += f" AND cohort LIKE '%{cohort}%'"
 
     try:
@@ -691,7 +763,7 @@ def FilterStudent():
             except Exception as e:
                 return str(e)       
          
-        return render_template('PickUpStudent.html', student_list=student_list)
+        return render_template('PickUpStudent.html',id=id, student_list=student_list,programme_list=filterProgramme(),cohort_list=filterCohort(),level_list=filterLevel())
 
     except Exception as e:
         return str(e)
@@ -706,16 +778,16 @@ def FilterPickedStudent():
     level= request.form['search-level']
     programme=request.form['search-programme']
     cohort=request.form['search-cohort']
-    id=request.form['lec_id']
+    id=session['loginLecturer']
 
     select_sql = f"SELECT * FROM student WHERE supervisor = '{id}'"
     cursor = db_conn.cursor()
 
     if level != 'All':
           select_sql += f" AND level LIKE '%{level}%'"
-    if programme:
+    if programme !='All':
           select_sql += f" AND programme LIKE '%{programme}%'"
-    if level:
+    if cohort !='All':
           select_sql += f" AND cohort LIKE '%{cohort}%'"
 
     try:
@@ -764,13 +836,568 @@ def FilterPickedStudent():
             except Exception as e:
                 return str(e)       
          
-        return render_template('DropStudent.html', student_list=student_list)
+        return render_template('DropStudent.html', id=id,student_list=student_list,programme_list=filterProgramme(),cohort_list=filterCohort(),level_list=filterLevel())
 
     except Exception as e:
         return str(e)
 
     finally:
         cursor.close()
+
+
+
+####################### ADMIN #########################
+@app.route('/login_admin')
+def login_admin():
+    return render_template('LoginAdmin.html')
+
+@app.route("/loginAdmin", methods=['GET','POST'])
+def loginAdmin():
+    if request.method == 'POST':
+        admin_id = request.form['admin_ID']
+        password = request.form['password']
+
+        if admin_id != "a" or password != "1":
+            return render_template('LoginAdmin.html')
+        #session['logedInAdmin'] = str(admin_id)
+
+    return displayRequest()
+
+@app.route("/displayRequest", methods=['GET','POST'])
+def displayRequest():
+    select_sql = "SELECT * FROM request WHERE status ='pending'"
+    cursor = db_conn.cursor()
+
+    try:
+        cursor.execute(select_sql)
+        requests = cursor.fetchall()  # Fetch all request
+               
+        request_list = []
+
+        for requestEdit in requests:
+            req_id = requestEdit[0]
+            req_attribute = requestEdit[1]
+            req_change = requestEdit[2]
+            req_reason = requestEdit[4]
+            req_studentId = requestEdit[5]
+
+            try:                
+                request_data = {
+                    "id": req_id,
+                    "attribute": req_attribute,
+                    "change": req_change,
+                    "reason": req_reason,
+                    "studentId": req_studentId,
+                }
+
+                # Append the student's dictionary to the student_list
+                request_list.append(request_data)
+                
+
+            except Exception as e:
+                return str(e)               
+
+       
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursor.close()
+    
+    return render_template('AdminDashboard.html', request_list=request_list,programme_list=filterProgramme(),cohort_list=filterCohort(),level_list=filterLevel())
+
+@app.route("/approveReq", methods=['GET','POST'])
+def approveReq():
+    selected_request_ids = request.form.getlist('selected_requests[]')
+    action= request.form['action']
+
+    resultAttributes = []  # Store the result attributes here
+    resultChange = []
+    resultStudentId=[]
+    resultOri=[]
+    request_list = []
+
+    if action =='approve':
+        try:
+            cursor = db_conn.cursor()
+            
+            for request_id in selected_request_ids:
+                get_attribute = "SELECT attribute FROM request WHERE requestId=%s"
+                cursor.execute(get_attribute, (request_id,))
+                attribute_result = cursor.fetchone()  # Fetch the result for this request_id
+
+                get_change = "SELECT newData FROM request WHERE requestId=%s"
+                cursor.execute(get_change, (request_id,))
+                change_result = cursor.fetchone()  # Fetch the result for this request_id
+
+                get_studentId = "SELECT studentId FROM request WHERE requestId=%s"
+                cursor.execute(get_studentId, (request_id,))
+                studentId_result = cursor.fetchone()  # Fetch the result for this request_id
+                
+                if attribute_result:
+                    resultAttributes.append(attribute_result[0])  # Append the attribute value to the list
+
+                if change_result:
+                    resultChange.append(change_result[0])  # Append the change value to the list
+
+                if studentId_result:
+                    resultStudentId.append(studentId_result[0])  # Append the change value to the list
+
+                #get ori data
+                get_ori = f"SELECT `{attribute_result[0]}` FROM student WHERE studentId=%s"
+                cursor.execute(get_ori, (studentId_result,))
+                ori_result = cursor.fetchone()  # Fetch the result for this request_id
+                
+                if ori_result:
+                    resultOri.append(ori_result[0])  # Append the change value to the list
+
+                # Use string formatting to create the SQL query
+                update_sql = f"UPDATE student SET `{attribute_result[0]}` = %s WHERE studentId=%s"
+                cursor.execute(update_sql, (change_result[0], studentId_result[0]))
+                db_conn.commit()
+                    
+            db_conn.commit()
+            
+        finally:
+            cursor.close()
+
+        #update the status of the request        
+        try:       
+            for request_id in selected_request_ids:
+                update_sql = "UPDATE request SET status = 'approved' WHERE requestId=%s"
+                cursor = db_conn.cursor()    
+                cursor.execute(update_sql, (request_id,))
+                db_conn.commit()                    
+
+        finally:
+            cursor.close()
+            
+        return render_template('requestOutput.html', resultAttributes=resultAttributes
+                            ,resultChange=resultChange
+                            ,resultStudentId=resultStudentId
+                            ,resultOri=resultOri)
+
+    if action == 'reject':
+        try:
+            cursor = db_conn.cursor()
+
+            for request_id in selected_request_ids:
+                update_sql = "UPDATE request SET status = 'rejected' WHERE requestId=%s"
+                cursor.execute(update_sql, (request_id,))
+                db_conn.commit()
+        finally:
+            cursor.close()
+
+        for request_id in selected_request_ids:
+            select_sql = "SELECT * FROM request WHERE status ='rejected' AND requestId=%s"
+            cursor = db_conn.cursor()
+
+            try:
+                cursor.execute(select_sql, (request_id,))
+                requests = cursor.fetchall()  # Fetch all request              
+
+                for requestEdit in requests:
+                    req_id = requestEdit[0]
+                    req_attribute = requestEdit[1]
+                    req_change = requestEdit[2]
+                    req_reason = requestEdit[4]
+                    req_studentId = requestEdit[5]
+
+                    try:
+                        request_data = {
+                            "id": req_id,
+                            "attribute": req_attribute,
+                            "change": req_change,
+                            "reason": req_reason,
+                            "studentId": req_studentId,
+                        }
+
+                        # Append the student's dictionary to the student_list
+                        request_list.append(request_data)
+
+                    except Exception as e:
+                        return str(e)
+
+            except Exception as e:
+                return str(e)
+
+            finally:
+                cursor.close()
+
+        return render_template('requestRejectOutput.html', request_list=request_list)
+        
+@app.route("/filterRequest" ,methods=['GET','POST'])
+def FilterRequest():
+
+    level= request.form['search-level']
+    programme=request.form['search-programme']  # Check if the field exists
+    cohort=request.form['search-cohort']
+    attribute=request.form['search-attribute']
+
+    select_sql = "SELECT * FROM request r ,student s WHERE status ='pending' AND r.studentId = s.studentId "
+    cursor = db_conn.cursor()
+
+    if level != 'All':
+          select_sql += f" AND s.level LIKE '%{level}%'"
+    if programme !='All':
+          select_sql += f" AND s.programme LIKE '%{programme}%'"
+    if cohort !='All':
+          select_sql += f" AND s.cohort LIKE '%{cohort}%'"
+    if attribute !='All':
+          select_sql += f" AND r.attribute LIKE '%{attribute}%'"
+
+    select_sql += " Order by r.requestId,r.studentId"
+
+    try:
+        cursor.execute(select_sql)
+        requests = cursor.fetchall()  # Fetch all request
+               
+        request_list = []
+
+        for requestEdit in requests:
+            req_id = requestEdit[0]
+            req_attribute = requestEdit[1]
+            req_change = requestEdit[2]
+            req_reason = requestEdit[4]
+            req_studentId = requestEdit[5]
+
+            try:                
+                request_data = {
+                    "id": req_id,
+                    "attribute": req_attribute,
+                    "change": req_change,
+                    "reason": req_reason,
+                    "studentId": req_studentId,
+                }
+
+                # Append the student's dictionary to the student_list
+                request_list.append(request_data)
+                
+
+            except Exception as e:
+                return str(e)               
+
+       
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursor.close()
+
+    
+
+
+    return render_template('AdminDashboard.html', request_list=request_list,programme_list=filterProgramme(),cohort_list=filterCohort(),level_list=filterLevel())
+
+def filterProgramme():
+    selectProgram_sql = "SELECT DISTINCT programme FROM student;"
+    cursorProgramme = db_conn.cursor()
+    try:
+        cursorProgramme.execute(selectProgram_sql)
+        programmes = cursorProgramme.fetchall()  # Fetch all request
+                
+        programme_list = []
+
+        for programmeExits in programmes:
+            programme = programmeExits[0]          
+
+            try:                
+                programme_data = {
+                    "programme": programme,
+                }
+
+                # Append the student's dictionary to the student_list
+                programme_list.append(programme_data)
+            
+
+            except Exception as e:
+                return str(e)               
+
+    
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursorProgramme.close()
+
+    selectCohort_sql = "SELECT * FROM cohort;"
+    cursorCohort = db_conn.cursor()
+    try:
+        cursorCohort.execute(selectCohort_sql)
+        cohorts = cursorCohort.fetchall()  # Fetch all request
+                
+        cohort_list = []
+
+        for cohortExits in cohorts:
+            cohort = cohortExits[0]          
+
+            try:                
+                cohort_data = {
+                    "cohort": cohort,
+                }
+
+                # Append the student's dictionary to the student_list
+                cohort_list.append(cohort_data)
+            
+
+            except Exception as e:
+                return str(e)               
+
+    
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursorCohort.close()
+
+    return programme_list
+
+def filterCohort():
+    selectCohort_sql = "SELECT * FROM cohort;"
+    cursorCohort = db_conn.cursor()
+    try:
+        cursorCohort.execute(selectCohort_sql)
+        cohorts = cursorCohort.fetchall()  # Fetch all request
+                
+        cohort_list = []
+
+        for cohortExits in cohorts:
+            cohort = cohortExits[0]          
+
+            try:                
+                cohort_data = {
+                    "cohort": cohort,
+                }
+
+                # Append the student's dictionary to the student_list
+                cohort_list.append(cohort_data)
+            
+
+            except Exception as e:
+                return str(e)               
+
+    
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursorCohort.close()
+
+    return cohort_list
+
+def filterLevel():
+    selectLevel_sql = "SELECT DISTINCT level FROM student;"
+    cursorLevel = db_conn.cursor()
+    try:
+        cursorLevel.execute(selectLevel_sql)
+        levels = cursorLevel.fetchall()  # Fetch all request
+                
+        level_list = []
+
+        for levelExits in levels:
+            level = levelExits[0]          
+
+            try:                
+                level_data = {
+                    "level": level,
+                }
+
+                # Append the student's dictionary to the student_list
+                level_list.append(level_data)
+            
+
+            except Exception as e:
+                return str(e)               
+
+    
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursorLevel.close()
+
+    return level_list
+
+@app.route("/displayCompany", methods=['GET','POST'])
+def displayCompany():
+
+    select_sql = "SELECT * FROM company WHERE status ='pending'"
+    cursor = db_conn.cursor()
+    
+    try:
+        cursor.execute(select_sql)
+        companys = cursor.fetchall()  # Fetch all request
+               
+        company_list = []
+
+        for companyExits in companys:
+            company_id = companyExits[0]
+            company_password = companyExits[1]
+            company_name = companyExits[2]
+            company_about = companyExits[3]
+            company_address = companyExits[4]
+            company_email= companyExits[5]
+            company_phone= companyExits[6]            
+
+            try:                
+                company_data = {
+                    "id": company_id,
+                    "password": company_password,
+                    "name": company_name,
+                    "about": company_about,
+                    "address": company_address,
+                    "email": company_email,
+                    "phone": company_phone,
+                    
+                }
+
+                # Append the student's dictionary to the student_list
+                company_list.append(company_data)
+                
+
+            except Exception as e:
+                return str(e)               
+
+       
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursor.close()
+
+    return render_template('displayCompany.html',company_list=company_list)
+
+@app.route("/filterCompany" ,methods=['GET','POST'])
+def FilterCompany():
+
+    name= request.form['search-name']
+    address=request.form['search-address']  # Check if the field exists   
+
+    select_sql = "SELECT * FROM company WHERE status ='pending'"
+    cursor = db_conn.cursor()
+
+    if name :
+          select_sql += f" AND name LIKE '%{name}%'"
+    if address:
+          select_sql += f" AND address LIKE '%{address}%'"
+   
+   
+
+    try:
+            cursor.execute(select_sql)
+            companys = cursor.fetchall()  # Fetch all request
+                
+            company_list = []
+
+            for companyExits in companys:
+                company_id = companyExits[0]
+                company_password = companyExits[1]
+                company_name = companyExits[2]
+                company_about = companyExits[3]
+                company_address = companyExits[4]
+                company_email= companyExits[5]
+                company_phone= companyExits[6]            
+
+                try:                
+                    company_data = {
+                        "id": company_id,
+                        "password": company_password,
+                        "name": company_name,
+                        "about": company_about,
+                        "address": company_address,
+                        "email": company_email,
+                        "phone": company_phone,
+                        
+                    }
+
+                    # Append the student's dictionary to the student_list
+                    company_list.append(company_data)
+                    
+
+                except Exception as e:
+                    return str(e)               
+
+        
+    except Exception as e:
+        return str(e)
+
+    finally:
+        cursor.close()
+
+
+
+    return render_template('displayCompany.html',company_list=company_list)
+
+@app.route("/approveCompany", methods=['GET','POST'])
+def approveCompany():
+    selected_selected_companys = request.form.getlist('selected_companys[]')
+    selected_company_name = request.form.getlist('selected_name[]')
+    action = request.form['action']
+
+    
+    cursorApprove = db_conn.cursor()
+    cursorName = db_conn.cursor()
+    cursorReject = db_conn.cursor()   
+    name_list = [] 
+
+    if action == 'approve':
+        try:
+            
+            
+            for conpanyId in selected_selected_companys:
+                update_sql = "UPDATE company SET status ='activeted' WHERE companyId=%s"
+                cursorApprove.execute(update_sql, (conpanyId))
+                db_conn.commit()
+
+                selectName_sql = "SELECT name FROM company WHERE companyId=%s;"                
+                cursorName.execute(selectName_sql, (conpanyId))
+                names = cursorName.fetchall()  # Fetch all request
+
+                for nameExits in names:
+                    name = nameExits[0]
+
+            
+                try:
+                    name_data = {
+                        "name": name,
+                    }
+                    name_list.append(name_data)
+                except Exception as e:
+                    return str(e)
+        finally:
+            cursorApprove.close()
+            cursorName.close()
+
+        return render_template('companyOutput.html', company_list=name_list)
+
+    if action == 'reject':
+        try:
+            for conpanyId in selected_selected_companys:
+                update_sql = "UPDATE company SET status ='rejected' WHERE companyId=%s"                
+                cursorReject.execute(update_sql, (conpanyId))
+                db_conn.commit()                 
+
+                selectName_sql = "SELECT name FROM company WHERE companyId=%s and status='rejected';"                
+                cursorName.execute(selectName_sql, (conpanyId))
+                names = cursorName.fetchall()  # Fetch all request
+
+                for nameExits in names:
+                    name = nameExits[0]
+
+            
+                try:
+                    name_data = {
+                        "name": name,
+                    }
+                    name_list.append(name_data)
+                except Exception as e:
+                    return str(e)   
+
+        finally:
+            cursorReject.close()
+
+        return render_template('companyRejectOutput.html', company_list=name_list)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)

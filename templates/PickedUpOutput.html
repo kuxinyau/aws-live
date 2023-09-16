@@ -1,23 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<style>
+    
+		table {
+				border-collapse: collapse;
+				font-family: Tahoma, Geneva, sans-serif;
+			}
+			table td {
+				padding: 15px;
+			}
+			table thead td {
+				background-color: #54585d;
+				color: #ffffff;
+				font-weight: bold;
+				font-size: 13px;
+				border: 1px solid #54585d;
+			}
+			table tbody td {
+				color: #636363;
+				border: 1px solid #dddfe1;
+				background-color: darkgrey;
+			}
+			table tbody tr {
+				background-color: #f9fafb;
+			}
+			table tbody tr:nth-child(odd) {
+				background-color: #ffffff;
+			}
+	</style>
 <center>
 	<font color="grey" size="5" style="font-family: avenir">
 		<body bgcolor="lightgrey">
-			<h1>PICK UP SUCCESSFUL</h1><br>
-			<h2>Following Student has been picked up</h2><br>
-            {% for student in student_list %}
-
-			<h5>{{ student }}</h5><br>
-
-            {% endfor %}
-			<title>Student Pick Up Output</title>
-				<form action="/leclogin" autocomplete="on" method = "GET">
-
-					<button type="submit" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;" 
-					>GO BACK</button><br><br>
-
-				</form>
+			{% if student_list %}
+                <h1>Picked Up Student Success</h1><br>
+                <h2>Following student has been picked</h2><br>
+                
+				<table>
+					<thead>
+						<tr>							
+							<td>ID</td>
+							<td>Name</td>
+							<td>Gender</td>
+							<td>Email</td>
+							<td>Level</td>
+							<td>Programme</td>
+							<td>Cohort</td>
+						</tr>
+					</thead>
+					<tbody>													
+							{% for student in student_list %}
+							<tr>
+								<td> {{ student.student_id }}</td>
+								<td> {{ student.name }}</td>
+								<td> {{ student.gender }}</td>
+								<td> {{ student.email }}</td>
+								<td> {{ student.level }}</td>
+								<td> {{ student.programme }}</td>
+								<td> {{ student.cohort }}</td>
+							</tr>
+							{% endfor %}				
+					</tbody>
+				</table>                          
+            
+                <title>Student Picked Up Output</title>
+                    <form action="/displayStudent" autocomplete="on" method="POST">
+						<input  type="hidden" name="lec_id" value="{{session['loginLecturer']}}" >
+						<input  type="hidden" name="action" value="pickUp" >			
+                        <br><button type="submit" name="action" value="pickUp" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">GO BACK</button><br><br>
+                    </form>
+            {% else %} 
+                <h1>Please select at least one student</h1><br>                              
+                <title>None selected student</title>
+                    <form action="/displayStudent" autocomplete="on" method="POST">
+						<input  type="hidden" name="lec_id" value="{{session['loginLecturer']}}" >
+						<input  type="hidden" name="action" value="pickUp" >				
+                        <button type="submit" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">GO BACK</button><br><br>
+                    </form>
+            {% endif %}  
 		</body>
 	</font>
 </center>
@@ -26,3 +86,5 @@
 
 </body>
 </html>
+
+

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<style>
+    
+    table {
+            border-collapse: collapse;
+            font-family: Tahoma, Geneva, sans-serif;
+        }
+        table td {
+            padding: 15px;
+        }
+        table thead td {
+            background-color: #54585d;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 13px;
+            border: 1px solid #54585d;
+        }
+        table tbody td {
+            color: #636363;
+            border: 1px solid #dddfe1;
+            background-color: darkgrey;
+        }
+        table tbody tr {
+            background-color: #f9fafb;
+        }
+        table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+</style>
+<head>
+<center>
+	<font color="grey" size="5" style="font-family: avenir">
+		<body bgcolor="lightgrey">
+            {% if resultAttributes %}
+                <h1>Approve Success</h1><br>
+                <h2>Following request has been approved</h2><br>
+                
+                <table>
+                    <thead>
+                        <tr>
+                        <td>Student ID</td>
+                        <td>Edit Attribute</td>
+                        <td>Old Data</td>
+                        <td>New Data</td> 
+                        </tr>
+                    </thead>
+                    <tbody>        
+                        {% for student_id in resultStudentId %}
+                        {% set index = resultStudentId.index(student_id) %}
+                        {% set attribute = resultAttributes[index] if index < resultAttributes|length else '' %}
+                        {% set ori = resultOri[index] if resultOri is defined and index < resultOri|length else '' %}
+                        {% set change = resultChange[index] if resultChange is defined and index < resultChange|length else '' %}
+                            <tr>
+                                
+                                <td>{{ student_id }}</td>
+                                <td>{{ attribute }}</td>
+                                <td>{{ ori }}</td>
+                                <td>{{ change }}</td>                                                                            
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>                                      
+            
+                <title>Request Approve Output</title>
+                    <form action="/displayRequest" autocomplete="on" method="GET">
+                        <br><button type="submit" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">GO BACK</button><br><br>
+                    </form>
+            {% else %} 
+                <h1>Please select at least one request</h1><br>                              
+                <title>None selected request</title>
+                    <form action="/displayRequest" autocomplete="on" method="GET">
+                        <button type="submit" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">GO BACK</button><br><br>
+                    </form>
+            {% endif %}  
+		</body>
+	</font>
+</center>
+</head>
+<body>
+
+</body>
+</html>

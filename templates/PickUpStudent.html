@@ -378,7 +378,7 @@
 
 <body>
     <h1 class="internship-header">Pick Up Student</h1>
-   
+    <input type="hidden" name="lec_id" value="{{{{session['loginLecturer']}}}}">
         <div class="overall">
             <div class="div-line">
                 <form action="/filterStudent" autocomplete="on" method="post">
@@ -387,19 +387,32 @@
                             <label class="label-search-company">Level</label>
                             <select name="search-level">
                                 <option value="All">All</option>
-                                <option value="Diploma">Diploma</option>
-                                <option value="Bachelor">Bachelor</option>                        
+                                {% for level in level_list %}     
+                                <option value="{{level.level}}">{{level.level}}</option>
+                                {% endfor %}
                             </select>
                         </div>
+                        
 
                         <div class="group-search-title">
                             <label class="label-search-title">Programme</label>
-                            <input type="text" name="search-programme" placeholder="eg. RSW">
+                                                   
+                            <select name="search-programme"> 
+                                <option value="All">All</option>           
+                                {% for programme in programme_list %}                        
+                                <option value="{{programme.programme}}">{{programme.programme}}</option>
+                                {% endfor %}                        
+                            </select>
                         </div>
                         
                         <div class="group-search-title">
                             <label class="label-search-title">Cohort</label>
-                            <input type="text" name="search-cohort" placeholder="eg. 1">
+                            <select name="search-cohort"> 
+                                <option value="All">All</option>           
+                                {% for cohort in cohort_list %}                        
+                                <option value="{{cohort.cohort}}">{{cohort.cohort}}</option>
+                                {% endfor %}                        
+                            </select>
                         </div>
 
                         <div class-group-button>
@@ -433,7 +446,7 @@
                             </thead>
                             <tbody>
                             
-                                <input  type="hidden" name="lec_id" value="lec001" >
+                                <input  type="hidden" name="lec_id" value="{{session['loginLecturer']}}" >
                                 {% if student_list %}
                                     {% for student in student_list %}
                                     <tr>
