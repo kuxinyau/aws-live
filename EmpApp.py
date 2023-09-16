@@ -856,7 +856,7 @@ def login_admin():
     return render_template('LoginAdmin.html')
 
 @app.route("/logoutAdmin")
-def LogoutLec():
+def logoutAdmin():
     return render_template('home.html')
 
 @app.route("/loginAdmin", methods=['GET','POST'])
