@@ -121,30 +121,34 @@ def LoginLec():
                 cursor.execute(select_sql, (lecturer[0],))
                 raw_students = cursor.fetchall()
 
-                # Process the raw data
-                students = {}
-                for row in raw_students:
-                    studId = row[0]
-                    if studId not in students:
-                        students[studId] = {
-                            'studentId': studId,
-                            'name': row[1],
-                            'programme': row[8],
-                            'email': row[6],
-                            'gender' : row[4],
-                            'hp' : row[3],
-                            'level' : row[7],
-                            'cohortId' : row[10],
-                            'company' : row[11],
-                            'compStatus' : row[12],
-                            'startDate': row[13],
-                            'endDate': row[14],
-                            'reports': []
-                        }
-                    students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
+                if raw_students:
+                    # Process the raw data
+                    students = {}
+                    for row in raw_students:
+                        studId = row[0]
+                        if studId not in students:
+                            students[studId] = {
+                                'studentId': studId,
+                                'name': row[1],
+                                'programme': row[8],
+                                'email': row[6],
+                                'gender' : row[4],
+                                'hp' : row[3],
+                                'level' : row[7],
+                                'cohortId' : row[10],
+                                'company' : row[11],
+                                'compStatus' : row[12],
+                                'startDate': row[13],
+                                'endDate': row[14],
+                                'reports': []
+                            }
+                        students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
+                    
+                    return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[raw_students[0][0]]['reports']), image_url=response)
                 
-                return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[raw_students[0][0]]['reports']), image_url=response)
-            
+                else:
+                    return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
+
         except Exception as e:
             return str(e)
 
@@ -192,27 +196,29 @@ def LecHome():
                 raw_students = cursor.fetchall()
 
                 # Process the raw data
-                students = {}
-                for row in raw_students:
-                    studId = row[0]
-                    if studId not in students:
-                        students[studId] = {
-                            'studentId': studId,
-                            'name': row[1],
-                            'programme': row[8],
-                            'email': row[6],
-                            'gender' : row[4],
-                            'hp' : row[3],
-                            'level' : row[7],
-                            'cohortId' : row[10],
-                            'company' : row[11],
-                            'compStatus' : row[12],
-                            'startDate': row[13],
-                            'endDate': row[14],
-                            'reports': []
-                        }
-                    students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
-            
+                if raw_students:
+                    students = {}
+                    for row in raw_students:
+                        studId = row[0]
+                        if studId not in students:
+                            students[studId] = {
+                                'studentId': studId,
+                                'name': row[1],
+                                'programme': row[8],
+                                'email': row[6],
+                                'gender' : row[4],
+                                'hp' : row[3],
+                                'level' : row[7],
+                                'cohortId' : row[10],
+                                'company' : row[11],
+                                'compStatus' : row[12],
+                                'startDate': row[13],
+                                'endDate': row[14],
+                                'reports': []
+                            }
+                        students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
+                else:
+                    return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
         except Exception as e:
             return str(e)
 
