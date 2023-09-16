@@ -453,10 +453,6 @@ def GetEmp():
 
 @app.route("/editlec", methods=['POST'])
 def UpdateEmp():
-    action=request.form['action']
-
-    if action =='update':
-
         lec_id = request.form['lec_id']
         password = request.form['password']
         name = request.form['name']
@@ -508,9 +504,6 @@ def UpdateEmp():
         finally:
             cursor.close()
         return render_template('UpdateLecOutput.html', name=name)
-    
-    else:   
-        return render_template('LecturerHome.html')
 
 @app.route("/displayStudent" ,methods=['GET','POST'])
 def GetStudent():
