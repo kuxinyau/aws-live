@@ -378,7 +378,7 @@
 
 <body>
     <h1 class="internship-header">Pick Up Student</h1>
-    <input type="hidden" name="lec_id" value="{{{{session['loginLecturer']}}}}">
+    <input type="hidden" name="lec_id" value="{{session['loginLecturer']}}">
         <div class="overall">
             <div class="div-line">
                 <form action="/filterStudent" autocomplete="on" method="post">
@@ -446,7 +446,7 @@
                             </thead>
                             <tbody>
                             
-                                <input  type="hidden" name="lec_id" value="{{session['loginLecturer']}}" >
+                                <input  type="hidden" name="lec_id" value="{{ session['loginLecturer'] }}" >
                                 {% if student_list %}
                                     {% for student in student_list %}
                                     <tr>
