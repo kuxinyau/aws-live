@@ -81,6 +81,7 @@
     .row {
         margin-right: -15px;
         margin-left: -15px;
+        margin-bottom: 0 !important;
     }
 
     .container .jumbotron,
@@ -276,7 +277,8 @@ submitBtn{
         margin: 30px 0;
         border: 1px solid #ccc;
         border-radius: 10px;
-        font-size: 14px;
+        font-size: 16px;
+        cursor: pointer;
         /* padding: 20px; */
     }
 
@@ -391,23 +393,23 @@ submitBtn{
 
     /* Bootstrap display field CSS */
     /* Add vertical spacing between each field in the details-content-body */
-    .details-content-body .row {
+    .row {
         margin-bottom: 10px;
         /* Adjust this value to your desired spacing */
         font-size: 14px;
     }
 
     /* Optional: Add some padding inside each field for better visual separation */
-    .details-content-body .row .col-md-2,
-    .details-content-body .row .col-md-10 {
+    .row .col-md-2,
+    .row .col-md-10 {
         padding: 5px 10px;
     }
 
-    .details-content-body .row .col-md-2 {
+    .row .col-md-2 {
         text-align: right;
     }
 
-    .details-content-body .row .col-md-10 input {
+    .row .col-md-10 input {
         font-size: 14px;
     }
 
@@ -420,6 +422,117 @@ submitBtn{
     .address-label {
         display: flex;
         justify-content: flex-end;
+    }
+
+    /* Progress Report CSS */
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        /* Add background color transition */
+    }
+
+    /* Style for the expanded header */
+    .report-header.expanded {
+        background-color: lightgrey;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    /* Style for the report-content */
+    .report-content {
+        display: none;
+        padding: 15px;
+        border-top: 1px solid #ccc;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        background-color: #fff;
+        transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+        /* Add transition for max-height and padding */
+        overflow: hidden;
+        /* Hide content overflow */
+    }
+
+    /* Style for the arrow icon */
+    .report-header .fa {
+        transition: transform 0.3s;
+    }
+
+    /* Style for the arrow icon when expanded */
+    .report-header.expanded .fa {
+        transform: rotate(180deg);
+    }
+
+    .due-details {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .due-details i {
+        margin-left: 20px;
+    }
+
+    .due-details .due-date {
+        color: #cc0000;
+    }
+
+    .report-content-details {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    /* Style for the Submit Button */
+    .submit-button {
+        background-color: #4CAF50;
+        /* Green background */
+        color: #fff;
+        /* White text */
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        /* 10px border radius */
+        cursor: pointer;
+        transition: background-color 0.3s;
+        /* Smooth background color transition */
+    }
+
+    .submit-button:hover {
+        background-color: #45a049;
+        /* Darker green on hover */
+    }
+
+    .internship-details {
+        padding: 10px;
+        color: #2a43d1;
+        text-align: center;
+    }
+
+    /* Status styles */
+    .status-pending {
+        color: darkgoldenrod;
+        font-weight: bold;
+    }
+
+    .status-submitted,
+    .status-approved {
+        color: darkgreen;
+        font-weight: bold;
+    }
+
+    .status-rejected {
+        color: red;
+        font-weight: bold;
+    }
+
+    .submission-remark {
+        padding: 10px 0;
+        color: red;
+        text-align: start;
     }
 </style>
 
@@ -463,7 +576,7 @@ submitBtn{
 
     <div class="container">
         <div class="details-header">
-            <h2>Edit Profile</h2>
+            <h2>Progress Report</h2>
             <div class="options">
                 <div class="upload-resume">
                     <i class="fa fa-id-card" aria-hidden="true"></i>
@@ -476,119 +589,108 @@ submitBtn{
             </div>
         </div>
 
-        {% if pendingRequestCount > 0 %}
-        <div class="alert alert-danger" style="padding: 10px;">
-            Unable to update. Please wait for the pending request to be approved.
+        <!-- Add a text says Internship period at make it centered-->
+        <div class="internship-details">
+            Internship period: <b>{{ start_date }} to {{ end_date }}</b>
         </div>
-        {% endif %}
 
-        {% if pendingRequestCount == 0 %}
-        <div class="alert alert-success" style="padding: 10px;">
-            Profile update is available.
+        <!-- Add a text says Internship period at make it centered-->
+        <div class="submission-remark">
+            <b>*Please submit the report in PDF format.</b>
         </div>
-        {% endif %}
 
-        <!-- Student details -->
-        <form action="/update_student" autocomplete="on" method="POST" enctype="multipart/form-data">
+        <!-- Report details -->
+        <div class="container">
+            {% for submission_date, report_name in combined_data %}
+            <form action="/uploadProgressReport" autocomplete="on" method="POST" enctype="multipart/form-data">
+                <!-- STORE SUBMISSION DATE-->
+                <input type="hidden" value="{{ submission_date }}" name="submission_date">
 
-            <div class="container">
+                <!-- Iterate over the report_list and display report details -->
+                {% for report in report_list %}
+                {% if report.reportType == report_name|replace(" ", "") %}
                 <div class="details">
-                    <div class="details-content-title">
-                        Student Details
+                    <!-- STORE REPORT TYPE HERE -->
+                    <input type="hidden" value="{{ report.reportType }}" name="report_type">
+                    <div class="report-header expandable">
+                        <div class="report-title">{{ report_name }}</div>
+                        <div class="due-details">
+                            <div class="due-date">Due: <b>{{ submission_date }}</b></div>
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </div>
                     </div>
-
-                    <div class="details-content-body">
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>Student ID</strong></label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" value="{{ session['loggedInStudent'] }}"
-                                    readonly>
+                    <div class="report-content">
+                        <div class="report-content-details">
+                            <!-- Submission -->
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <strong>Submission</strong>
+                                </div>
+                                <div class="col-md-10">
+                                    <input type="file" name="progress_report" class="upload-form"
+                                        accept="application/pdf" required>
+                                    <div style="padding-top: 5px;">
+                                        <a href="{{ url_for('viewProgressReport', report_type=report.reportType) }}"
+                                            target="_blank">View Report</a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>Student Email</strong></label>
-                            <div class="col-md-10">
-                                <input type="email" class="form-control" value="{{ email }}" readonly>
+                            <!-- Submitted Date -->
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <strong>Date submitted</strong>
+                                </div>
+                                <div class="col-md-10">
+                                    {{ report.submissionDate }}
+                                    {% if report.late == 1 %}
+                                    <b style="color: red;">(Late)</b>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- LEVEL AND PROGRAMME NO NEED UPDATE -->
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>Level</strong></label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" value="{{ level }}" readonly>
+                            <!-- Status -->
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <strong>Status</strong>
+                                </div>
+                                <div class="col-md-10">
+                                    {% if report.status == 'pending' %}
+                                    <span class="status-pending">Pending</span>
+                                    {% elif report.status == 'submitted' %}
+                                    <span class="status-submitted">Submitted</span>
+                                    {% elif report.status == 'approved' %}
+                                    <span class="status-approved">Approved</span>
+                                    {% elif report.status == 'rejected' %}
+                                    <span class="status-rejected">Rejected</span>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>Programme</strong></label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" value="{{ programme }}" readonly>
+                            <!-- Remark -->
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <strong>Remark</strong>
+                                </div>
+                                <div class="col-md-10">
+                                    {{ report.remark }}
+                                </div>
+                            </div>
+                            <!-- Submit Button -->
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <!-- Include any additional information here -->
+                                </div>
+                                <div class="col-md-10">
+                                    <button class="submit-button" {% if report.status=='approved' %}disabled{% endif
+                                        %}>Submit</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Personal details -->
-            <div class="container">
-                <div class="details">
-                    <div class="details-content-title">
-                        Personal Details
-                    </div>
-
-                    <div class="details-content-body">
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>Student Name</strong></label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" value="{{ studentName }}" name="studentName">
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>NRIC No.</strong></label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" value="{{ IC }}" readonly>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>Gender</strong></label>
-                            <div class="col-md-10">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="male" value="M" {% if
-                                        gender=='M' %} checked {% endif %}>
-                                    <label class="form-check-label" for="male">Male</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender" id="female" value="F" {%
-                                        if gender=='F' %} checked {% endif %}>
-                                    <label class="form-check-label" for="female">Female</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label center-label"><strong>Mobile Number</strong></label>
-                            <div class="col-md-10">
-                                <input type="tel" class="form-control" value="{{ mobileNumber }}" name="mobileNumber">
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-md-2 col-form-label address-label"><strong>Address</strong></label>
-                            <div class="col-md-10">
-                                <textarea type="text" class="form-control" cols="8" rows="6" name="address">{{ address }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="declaration-button">
-                <button class="acc-btn" {% if pendingRequestCount> 0 %} disabled {% endif %}>Update</button>
-            </div>
-        </form>
+                {% endif %}
+                {% endfor %}
+            </form>
+            {% endfor %}
+        </div>
         <hr>
     </div>
 
@@ -615,6 +717,28 @@ submitBtn{
                 var dropdownOptions = document.getElementById("dropdownOptions");
                 dropdownOptions.style.display = "none";
             }
+        });
+    </script>
+
+    <script>
+        //EXPAND REPORT CONTENTS
+        // Get all elements with the class "expandable"
+        const expandableElements = document.querySelectorAll('.expandable');
+
+        // Add click event listeners to each expandable element
+        expandableElements.forEach((element) => {
+            element.addEventListener('click', () => {
+                // Toggle the "expanded" class to change the background color and expand/collapse content
+                element.classList.toggle('expanded');
+
+                // Find the associated content and toggle its visibility
+                const content = element.nextElementSibling;
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                } else {
+                    content.style.display = 'block';
+                }
+            });
         });
     </script>
 </body>

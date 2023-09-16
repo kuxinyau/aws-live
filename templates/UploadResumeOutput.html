@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Emp Output</title>
+    <style>
+        html {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #fafafa;
+            font-family: sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #212529;
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        h2 {
+            color: #333333;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        p {
+            color: #333333;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            height: 45px;
+            width: 200px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0069d9;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="/student_home" autocomplete="on" method="POST" enctype="multipart/form-data">
+        <div class="container">
+            <h1>UPLOAD SUCCESSFUL!</h1>
+            <h2>{{ studentName }} [{{ id }}]</h2>
+            <h2>Great Job! You have uploaded your resume.</h2>
+            <br>
+            <button type="submit" class="btn btn-success">Back to home</button>
+        </div>
+    </form>
+</body>
+
+</html>
