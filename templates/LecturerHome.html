@@ -233,7 +233,7 @@
                         <th width="10%">Email</th>
                         <th width="5%">HP</th>
                         <th width="15%">Company</th>
-                        <th colspan="{{ len(student['reports']) }}" width="10%">Report</th>
+                        <th colspan="{{ student['reports']|length }}" width="10%">Report</th>
                     </tr>
                     {% set ns.current_cohort = student['cohortId'] %}
                     {% endif %}
