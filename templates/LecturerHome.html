@@ -233,7 +233,7 @@
                         <th width="10%">Email</th>
                         <th width="5%">HP</th>
                         <th width="15%">Company</th>
-                        <th colspan="{{ noReport }}" width="10%">Report</th>
+                        <th colspan="{{ len(student['reports']) }}" width="10%">Report</th>
                     </tr>
                     {% set ns.current_cohort = student['cohortId'] %}
                     {% endif %}
@@ -254,11 +254,30 @@
                         <td>{{ student['programme'] }}</td>
                         <td>{{ student['email'] }}</td>
                         <td>{{ student['hp'] }}</td>
+                        {% if student['company'] %}
                         <td>{{ student['company'] }}</td>
+                        {% else %}
+                        <td>-</td>
                         
                         {% for report in student['reports'] %}
                         <td>
-                            {% if report['reportLate'] == 1 %}
+                            {% if report['reportStatus'] == 'approved' and report['reportLate'] == 1 %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="background: linear-gradient(to right, #FFA500 , rgb(0, 200, 0)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report['reportStatus'] == 'rejected' and report['reportLate'] == 1 %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="background: linear-gradient(to right, #FFA500 , red); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report['reportStatus'] == 'approved' %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color:rgb(0, 200, 0)">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report['reportStatus'] == 'rejected' %}
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: red;">
+                                <i class="fa fa-file-pdf-o"></i>
+                            </a>
+                            {% elif report['reportLate'] == 1 %}
                             <a href="{{ url_for('LecViewReport', studentId=student['studentId'], reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #FFA500;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
@@ -266,16 +285,8 @@
                             <a href="{{ url_for('LecViewReport', studentId=student['studentId'], reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: blue;">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
-                            {% elif report['reportStatus'] == 'approved' %}
-                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: rgb(0, 200, 0);">
-                                <i class="fa fa-file-pdf-o"></i>
-                            </a>
-                            {% elif report['reportStatus'] == 'rejected' %}
-                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: red;">
-                                <i class="fa fa-file-pdf-o"></i>
-                            </a>
                             {% elif report['reportStatus'] == 'pending' %}
-                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #808080; cursor: not-allowed;" >
+                            <a href="{{ url_for('LecViewReport', studentId=student.studentId, reportType=report.reportType) }}" target="_blank" class="pdfReport" style="color: #808080; cursor: not-allowed;" aria-disabled="true">
                                 <i class="fa fa-file-pdf-o"></i>
                             </a>
                             {% endif %}

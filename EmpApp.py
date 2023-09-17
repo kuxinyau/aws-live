@@ -116,7 +116,7 @@ def LoginLec():
                 except Exception as e:
                     return str(e)
 
-                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
+                select_sql = "SELECT s.*, c.name, co.startDate, co.endDate, r.* FROM student s LEFT JOIN (SELECT ca1.student, ca1.job FROM companyApplication ca1 WHERE ca1.status = 'approved') approved_ca ON s.studentId = approved_ca.student LEFT JOIN job j ON approved_ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN (SELECT r1.student, r1.reportId FROM report r1 JOIN (SELECT student, job FROM companyApplication WHERE status = 'approved') ca2 ON r1.student = ca2.student) r ON s.studentId = r.student LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 raw_students = cursor.fetchall()
@@ -137,14 +137,13 @@ def LoginLec():
                                 'level' : row[7],
                                 'cohortId' : row[10],
                                 'company' : row[11],
-                                'compStatus' : row[12],
-                                'startDate': row[13],
-                                'endDate': row[14],
+                                'startDate': row[12],
+                                'endDate': row[13],
                                 'reports': []
                             }
-                        students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
+                        students[studId]['reports'].append({'reportType' : row[16], 'reportStatus' : row[17], 'reportLate' : row[18]})
                     
-                    return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[raw_students[0][0]]['reports']), image_url=response)
+                    return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
                 
                 else:
                     return render_template('LecturerHome.html', lecturer=lecturer, students=raw_students, image_url=response)
@@ -190,7 +189,7 @@ def LecHome():
                 except Exception as e:
                     return str(e)
 
-                select_sql = "SELECT s.*, c.name, ca.status, co.startDate, co.endDate, r.* FROM student s LEFT JOIN companyApplication ca ON s.studentId = ca.student LEFT JOIN job j ON ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN cohort co ON s.cohort = co.cohortId LEFT JOIN report r ON s.studentId = r.student WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
+                select_sql = "SELECT s.*, c.name, co.startDate, co.endDate, r.* FROM student s LEFT JOIN (SELECT ca1.student, ca1.job FROM companyApplication ca1 WHERE ca1.status = 'Approved') approved_ca ON s.studentId = approved_ca.student LEFT JOIN job j ON approved_ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN (SELECT r1.student, r1.reportId FROM report r1 JOIN (SELECT student, job FROM companyApplication WHERE status = 'Approved') ca2 ON r1.student = ca2.student) r ON s.studentId = r.student LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 raw_students = cursor.fetchall()
@@ -211,12 +210,11 @@ def LecHome():
                                 'level' : row[7],
                                 'cohortId' : row[10],
                                 'company' : row[11],
-                                'compStatus' : row[12],
-                                'startDate': row[13],
-                                'endDate': row[14],
+                                'startDate': row[12],
+                                'endDate': row[13],
                                 'reports': []
                             }
-                        students[studId]['reports'].append({'reportType' : row[17], 'reportStatus' : row[18], 'reportLate' : row[19]})
+                        students[studId]['reports'].append({'reportType' : row[16], 'reportStatus' : row[17], 'reportLate' : row[18]})
                 else:
                     return render_template('LecturerHome.html', lecturer=lecturer, students=raw_students, image_url=response)
         except Exception as e:
@@ -225,7 +223,7 @@ def LecHome():
         finally:   
             cursor.close()
         
-        return render_template('LecturerHome.html', lecturer=lecturer, students=students, noReport=len(students[raw_students[0][0]]['reports']), image_url=response)
+        return render_template('LecturerHome.html', lecturer=lecturer, students=students, image_url=response)
     
     else:
         return render_template('LecturerLogin.html')
