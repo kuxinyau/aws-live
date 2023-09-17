@@ -116,7 +116,7 @@ def LoginLec():
                 except Exception as e:
                     return str(e)
 
-                select_sql = "SELECT s.*, c.name, co.startDate, co.endDate, r.* FROM student s LEFT JOIN (SELECT ca1.student, ca1.job FROM companyApplication ca1 WHERE ca1.status = 'approved') approved_ca ON s.studentId = approved_ca.student LEFT JOIN job j ON approved_ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN (SELECT r1.student, r1.reportId FROM report r1 JOIN (SELECT student, job FROM companyApplication WHERE status = 'approved') ca2 ON r1.student = ca2.student) r ON s.studentId = r.student LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
+                select_sql = "SELECT s.*, c.name, co.startDate, co.endDate, r.reportId, r.submissionDate, r.reportType, r.status, r.late, r.remark FROM student s LEFT JOIN (SELECT ca1.student, ca1.job FROM companyApplication ca1 WHERE ca1.status = 'approved') approved_ca ON s.studentId = approved_ca.student LEFT JOIN job j ON approved_ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN (SELECT r1.student, r1.reportId, r1.submissionDate, r1.reportType, r1.status, r1.late, r1.remark FROM report r1 JOIN (SELECT student, job FROM companyApplication WHERE status = 'approved') ca2 ON r1.student = ca2.student) r ON s.studentId = r.student LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 raw_students = cursor.fetchall()
@@ -189,7 +189,7 @@ def LecHome():
                 except Exception as e:
                     return str(e)
 
-                select_sql = "SELECT s.*, c.name, co.startDate, co.endDate, r.* FROM student s LEFT JOIN (SELECT ca1.student, ca1.job FROM companyApplication ca1 WHERE ca1.status = 'Approved') approved_ca ON s.studentId = approved_ca.student LEFT JOIN job j ON approved_ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN (SELECT r1.student, r1.reportId FROM report r1 JOIN (SELECT student, job FROM companyApplication WHERE status = 'Approved') ca2 ON r1.student = ca2.student) r ON s.studentId = r.student LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
+                select_sql = "SELECT s.*, c.name, co.startDate, co.endDate, r.reportId, r.submissionDate, r.reportType, r.status, r.late, r.remark FROM student s LEFT JOIN (SELECT ca1.student, ca1.job FROM companyApplication ca1 WHERE ca1.status = 'Approved') approved_ca ON s.studentId = approved_ca.student LEFT JOIN job j ON approved_ca.job = j.jobId LEFT JOIN company c ON j.company = c.companyId LEFT JOIN (SELECT r1.student, r1.reportId, r1.submissionDate, r1.reportType, r1.status, r1.late, r1.remark FROM report r1 JOIN (SELECT student, job FROM companyApplication WHERE status = 'Approved') ca2 ON r1.student = ca2.student) r ON s.studentId = r.student LEFT JOIN cohort co ON s.cohort = co.cohortId WHERE s.supervisor = %s ORDER BY s.level, co.startDate DESC, s.studentId, r.reportId"
 
                 cursor.execute(select_sql, (lecturer[0],))
                 raw_students = cursor.fetchall()
